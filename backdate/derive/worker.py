@@ -21,7 +21,7 @@ import threading
 import time
 import traceback
 from collections.abc import Iterable, Iterator
-from contextlib import contextmanager
+from contextlib import contextmanager, nullcontext
 from dataclasses import dataclass
 from datetime import timedelta
 
@@ -30,7 +30,7 @@ from django.db.models.expressions import RawSQL
 
 from backdate import conf, reads
 from backdate.derive import registry
-from backdate.derive.context import Context, NotReady
+from backdate.derive.context import Context, NotReady, strict_reads
 from backdate.derive.save import Claim, SaveOutcome, save
 from backdate.models import Computation
 from backdate.observability import metrics
@@ -150,15 +150,22 @@ def _run(claim: Claim) -> str:
         return _fail(claim, f"no derivation named {claim.derivation!r}", permanent=True)
 
     ctx = Context(tenant_id=claim.tenant_id, version=reads.committed_version(claim.tenant_id))
+    guard = strict_reads(ctx) if conf.get_bool("STRICT_READS") else nullcontext()
     try:
-        result = derivation.fn(ctx, claim.key)
+        with guard:
+            result = derivation.fn(ctx, claim.key)
     except NotReady as wait:
-        request(claim.tenant_id, wait.derivation, [wait.key])
-        return _wait(claim)
+        if not ctx.violation:
+            request(claim.tenant_id, wait.derivation, [wait.key])
+            return _wait(claim)
     except Exception as exc:  # a bug in a derivation must not kill the worker
-        detail = "".join(traceback.format_exception_only(exc)).strip()
-        return _fail(claim, detail)
-    return save(claim, ctx, result, derivation.version).value
+        if not ctx.violation:
+            return _fail(claim, "".join(traceback.format_exception_only(exc)).strip())
+    else:
+        if not ctx.violation:
+            return save(claim, ctx, result, derivation.version).value
+    # A read outside ctx, even one the derivation caught: retrying cannot fix it.
+    return _fail(claim, str(ctx.violation), permanent=True)
 
 
 def _owned(claim: Claim) -> Computation | None:
