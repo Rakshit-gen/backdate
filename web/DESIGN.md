@@ -5,8 +5,11 @@
 One reader: an engineer, maybe an interviewer, who has five minutes and wants to see that the
 backend does what the README says. One job: follow a single backdated raise all the way through.
 The fact changes, the right results go stale, workers recompute under leases, corrections come out
-of the feed. Everything on the page is read from the running backend. When it isn't connected,
+of the feed. Everything on the site is read from the running backend. When it isn't connected,
 it shows a recording of a real run, labelled as one.
+
+It started as one long page and is now six, one per step, because each step needed room for
+its own table or chart.
 
 ## References looked at (2026-11-21)
 
@@ -14,7 +17,7 @@ it shows a recording of a real run, labelled as one.
   buffers, so scenes don't each spin up their own WebGL context. Adopted: one R3F canvas per
   scene at most, and the scenes are frameloop="demand".
 - Codrops, Efecto (ASCII and dithering shaders), and Paper Shaders: texture from a shader, not
-  from images. Adopted for the paper grain and carbon transfer, kept subtle.
+  from images. Tried for paper grain, then dropped (see below).
 - Awwwards SOTD, AI in Design Report 2026: a report turned into an editorial page where data and
   motion share one visual language. That is the bar for the feed and numbers sections.
 
@@ -33,45 +36,62 @@ recomputation: rock doesn't have leases.
 time is when the card got punched. It's strong on the two axes, but it gets novelty-heavy once
 you need a dependency graph and a feed.
 
-**Pick: A.** It's the only one where the metaphor *is* the data model. The sheet stack is the
+**Pick: A.** It's the only one where the metaphor _is_ the data model. The sheet stack is the
 bitemporal plane, and red ink on a struck-through figure is a restatement. Its vocabulary (sheet,
 carbon, ruling, red pen, posting) covers every section.
 
+## What changed after the first build
+
+The first version put a 3D stack of sheets in the hero, with shader grain and ledger rules across
+the whole page. On screen it failed: the stack was small and tilted, the grain read as JPEG noise,
+red and blue on white looked like a flag, and the rules ran through the text. What survived is
+the idea, drawn flat:
+
+- The bitemporal diagram is an SVG on the home page. Valid time across, versions down, hatched
+  rows for what a later write replaced, red for corrections. Dragging down it reads the facts as
+  known at that version.
+- WebGL is used once, for the invalidation graph, where it earns its place: every line and node
+  carries the time the correction reaches it, so one GSAP tween of a single uniform animates the
+  whole graph. Nodes are real buttons laid over the canvas.
+- The page background is plain. Ruling only appears inside tables.
+
 ## Tokens
 
-| Name | Light | Dark (carbon sheet) | Use |
-|---|---|---|---|
-| paper | `#EDF1E7` | `#1A2140` | page |
-| ruling | `#BCCDB6` | `#33406E` | ledger lines, grid |
-| graphite | `#262820` | `#DCE2F4` | text, fresh results |
-| carbon | `#2B3A9C` | `#8FA2FF` | pending, in-flight, knowledge axis |
-| redpen | `#C0281A` | `#FF6B5B` | changed ranges, stale, deltas |
+| Name     | Light     | Dark (carbon sheet) | Use                                   |
+| -------- | --------- | ------------------- | ------------------------------------- |
+| paper    | `#EDF1E7` | `#161C36`           | page                                  |
+| sheet    | `#F6F8F2` | `#1D2443`           | charts, inputs                        |
+| ruling   | `#C9D6C3` | `#313C66`           | table rules, grid, untouched edges    |
+| graphite | `#262820` | `#DCE2F4`           | text, fresh results                   |
+| carbon   | `#2B3A9C` | `#9AABFF`           | live state, selection, links on hover |
+| redpen   | `#C0281A` | `#FF7A6B`           | changed ranges, stale, differences    |
 
 Type: Archivo (variable, wdth 62 to 125), and nothing else. Headings use the expanded width,
-dense tables use the condensed width, all figures are tabular. The width axis does the work a
-second family usually would.
+small table headers the condensed width, all figures are tabular.
 
-Layout: left-aligned on a ledger grid. A narrow left gutter column holds the knowledge version,
-the way a ledger's date column does, so the numbers in the margin really are versions. The
-sections run in the order a backdate happens, so numbering them is honest.
+## Pages
 
-```
-| v | backdate                                   [sheet stack, 3D]     |
-|---|-------------------------------------------------------------------|
-| 1 | Correct a salary     form + simulated months, "Post" goes live    |
-| 2 | What went stale      graph: facts -> gross -> withholding         |
-| 3 | Recompute            live lease table, fencing replay             |
-| 4 | The feed             ledger lines, scrub by version               |
-| 5 | Measured             benchmark table                              |
-```
+| Page         | Shows                                                                             | Data                         |
+| ------------ | --------------------------------------------------------------------------------- | ---------------------------- |
+| Home         | salary as the database knew it at each version; the last correction in four steps | live or recording            |
+| Payroll      | a raise simulated month by month, checked against stored results, then posted     | live, simulation labelled    |
+| Invalidation | read sets as a graph; which results went stale and why                            | live or recording            |
+| Workers      | results per month with lease tokens; a step-through of the fencing test           | live; the replay is labelled |
+| Feed         | corrections per version; summed differences checked against stored results        | live or recording            |
+| Benchmarks   | numbers from `docs/benchmarks.md`                                                 | recorded, says so            |
+
+## Motion
+
+One orchestrated moment: the red travelling through the invalidation graph, which replays on
+request. Everything else moves only because data changed (a worker cell flashes when its status
+or seq changes) or the reader did something. With reduced motion the graph shows its final state.
 
 ## Checked against the defaults
 
-- Not cream with terracotta: the paper is green-ruled ledger stock, and the accent is a red-pen
+- Not cream with terracotta: the paper is green-tinted ledger stock, and the accent is a red-pen
   red that only ever marks a change.
 - Not near-black with acid green: dark mode is carbon-paper blue, from the same metaphor.
 - No eyebrows, no all-caps labels, no mono for small labels, no icon tiles, no glass, no
-  fade-up-on-scroll. Motion happens once on load (the sheets settle into the stack). After that,
-  things only move because data changed or the reader did something.
+  fade-up-on-scroll, no pill badges.
 - I first wanted IBM Plex. I swapped it for Archivo, because the width axis lets one family
-  carry both the display type and the ledger tables.
+  carry both the display type and the tables.

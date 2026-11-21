@@ -7,7 +7,7 @@ export type Tokens = { paper: string; sheet: string; ruling: string; graphite: s
 const FALLBACK: Tokens = {
   paper: "#edf1e7",
   sheet: "#f6f8f2",
-  ruling: "#bccdb6",
+  ruling: "#c9d6c3",
   graphite: "#262820",
   carbon: "#2b3a9c",
   redpen: "#c0281a",
