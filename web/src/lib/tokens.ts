@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useMemo, useSyncExternalStore } from "react";
 
 export type Tokens = { paper: string; sheet: string; ruling: string; graphite: string; carbon: string; redpen: string };
 
@@ -26,27 +26,43 @@ function read(): Tokens {
   };
 }
 
-/** The page's colour tokens, kept in sync with the colour scheme, for use in WebGL. */
-export function useTokens(): Tokens {
-  const [tokens, setTokens] = useState(FALLBACK);
-  useEffect(() => {
-    setTokens(read());
-    const mq = matchMedia("(prefers-color-scheme: dark)");
-    const update = () => setTokens(read());
-    mq.addEventListener("change", update);
-    return () => mq.removeEventListener("change", update);
-  }, []);
-  return tokens;
+function subscribeTo(query: string) {
+  return (onChange: () => void) => {
+    const mq = matchMedia(query);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  };
 }
 
-export function useReducedMotion(): boolean {
-  const [reduced, setReduced] = useState(false);
-  useEffect(() => {
-    const mq = matchMedia("(prefers-reduced-motion: reduce)");
-    setReduced(mq.matches);
-    const update = () => setReduced(mq.matches);
-    mq.addEventListener("change", update);
-    return () => mq.removeEventListener("change", update);
-  }, []);
-  return reduced;
+const stores = new Map<string, (onChange: () => void) => () => void>();
+
+/** Whether a media query matches. False on the server and during hydration. */
+export function useMedia(query: string): boolean {
+  if (!stores.has(query)) stores.set(query, subscribeTo(query));
+  return useSyncExternalStore(
+    stores.get(query)!,
+    () => matchMedia(query).matches,
+    () => false,
+  );
 }
+
+const noop = () => () => {};
+
+/** False while rendering on the server and hydrating, true after. */
+export const useHydrated = () =>
+  useSyncExternalStore(
+    noop,
+    () => true,
+    () => false,
+  );
+
+/** The page's colour tokens, kept in sync with the colour scheme, for use in WebGL. */
+export function useTokens(): Tokens {
+  const dark = useMedia("(prefers-color-scheme: dark)");
+  const hydrated = useHydrated();
+  // Tokens go to WebGL uniforms, never into markup, so reading the DOM here can't cause a mismatch.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  return useMemo(() => (hydrated ? read() : FALLBACK), [dark, hydrated]);
+}
+
+export const useReducedMotion = () => useMedia("(prefers-reduced-motion: reduce)");

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { ATTRIBUTE_NAMES, fmtDate, fmtTime } from "@/lib/format";
 import { cents } from "@/lib/payroll";
 import { affectedBy, MONTHS, monthOf } from "@/lib/scene";
@@ -24,7 +24,11 @@ export function Invalidation() {
 
   // A new correction posted from this browser becomes the one shown.
   const latest = corrections.at(-1)?.version ?? null;
-  useEffect(() => setVersion(latest), [latest]);
+  const [shownLatest, setShownLatest] = useState(latest);
+  if (shownLatest !== latest) {
+    setShownLatest(latest);
+    setVersion(latest);
+  }
 
   const change = corrections.find((c) => c.version === version);
   const depth = useMemo(

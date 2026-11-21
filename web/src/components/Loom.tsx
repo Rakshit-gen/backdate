@@ -2,7 +2,7 @@
 
 import { Canvas, useThree } from "@react-three/fiber";
 import gsap from "gsap";
-import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
+import { useEffect, useLayoutEffect, useMemo } from "react";
 import * as THREE from "three";
 import {
   edgeBuffers,
@@ -85,12 +85,16 @@ function Ink({
   lay,
   tokens,
   picked,
-  clock,
+  end,
+  reduced,
+  replay,
 }: {
   lay: Layout;
   tokens: Tokens;
   picked: number | null;
-  clock: { t: number };
+  end: number;
+  reduced: boolean;
+  replay: number;
 }) {
   const invalidate = useThree((s) => s.invalidate);
 
@@ -162,21 +166,21 @@ function Ink({
     invalidate();
   }, [tokens, mats, invalidate]);
 
-  // Each frame the parent's clock moved, copy it into the shaders.
+  // The one orchestrated moment: a single GSAP tween of time drives every line and node.
   useEffect(() => {
-    let raf = 0;
-    let last = -1;
-    const loop = () => {
-      if (clock.t !== last) {
-        last = clock.t;
-        for (const m of Object.values(mats)) m.uniforms.uTime!.value = clock.t;
-        invalidate();
-      }
-      raf = requestAnimationFrame(loop);
+    const setTime = (t: number) => {
+      for (const m of Object.values(mats)) m.uniforms.uTime!.value = t;
+      invalidate();
     };
-    loop();
-    return () => cancelAnimationFrame(raf);
-  }, [clock, mats, invalidate]);
+    if (reduced) {
+      setTime(end + 1);
+      return;
+    }
+    const box = { t: 0 };
+    setTime(0);
+    const tw = gsap.to(box, { t: end, duration: end, ease: "none", delay: 0.2, onUpdate: () => setTime(box.t) });
+    return () => void tw.kill();
+  }, [mats, invalidate, lay, end, reduced, replay]);
 
   useEffect(() => () => [lanes, edges, nodes].forEach((g) => g.dispose()), [lanes, edges, nodes]);
 
@@ -201,22 +205,10 @@ export function Loom({ graph, change, picked, onPick, replay }: Props) {
   const tokens = useTokens();
   const reduced = useReducedMotion();
   const lay = useMemo(() => layout(graph, change), [graph, change]);
-  const clock = useRef({ t: 0 }).current;
-
   const end = useMemo(() => {
     const depths = [...lay.depth.values()];
     return depths.length ? nodeStart(Math.max(...depths)) + 0.9 : 0.5;
   }, [lay]);
-
-  useEffect(() => {
-    if (reduced) {
-      clock.t = end + 1;
-      return;
-    }
-    clock.t = 0;
-    const tw = gsap.to(clock, { t: end, duration: end, ease: "none", delay: 0.2 });
-    return () => void tw.kill();
-  }, [lay, end, reduced, replay, clock]);
 
   const pct = (x: number, y: number) => ({ left: `${(x / W) * 100}%`, top: `${(y / H) * 100}%` });
 
@@ -224,7 +216,7 @@ export function Loom({ graph, change, picked, onPick, replay }: Props) {
     <div className="loom" style={{ aspectRatio: `${W} / ${H}` }}>
       <Canvas orthographic frameloop="demand" dpr={[1, 2]} gl={{ antialias: true, alpha: true }} aria-hidden="true">
         <Camera />
-        <Ink lay={lay} tokens={tokens} picked={picked} clock={clock} />
+        <Ink lay={lay} tokens={tokens} picked={picked} end={end} reduced={reduced} replay={replay} />
       </Canvas>
       {lay.lanes.map((l) => (
         <span key={`${l.entity}${l.attribute}`} className="loom-label lane" style={pct(LEFT - 14, l.y)}>

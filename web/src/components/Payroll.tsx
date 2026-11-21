@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
+import { useHydrated } from "@/lib/tokens";
 import { fmtDate } from "@/lib/format";
 import { assertFrom, cents, gross, type Piece, withholding } from "@/lib/payroll";
 import { byDerivation, knownAt, MONTHS } from "@/lib/scene";
@@ -29,8 +30,7 @@ export function Payroll() {
   const [result, setResult] = useState<WriteResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   // Until hydration the button would submit the form natively and reload the page.
-  const [ready, setReady] = useState(false);
-  useEffect(() => setReady(true), []);
+  const ready = useHydrated();
 
   const from = `2024-${String(month).padStart(2, "0")}-01`;
   const newCents = Math.round(amount * 100);

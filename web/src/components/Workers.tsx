@@ -2,7 +2,7 @@
 
 import { motion, useReducedMotion } from "motion/react";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { cents } from "@/lib/payroll";
 import { byDerivation, MONTHS } from "@/lib/scene";
 import type { Computation } from "@/lib/types";
@@ -18,20 +18,18 @@ const leased = (c: Computation) => c.lease.expires_at !== null && Date.parse(c.l
 
 function Cell({ c, field }: { c: Computation | undefined; field: string }) {
   const reduced = useReducedMotion();
-  // Flash only when a cell changes after the page loaded, not on first paint.
-  const seen = useRef(false);
-  useEffect(() => {
-    seen.current = true;
-  }, []);
+  // Flash only when a cell changes after it first appeared, not on first paint.
+  const [firstKey] = useState(c ? `${c.status}-${c.result_seq}` : "");
   if (!c) return <td className="muted">none</td>;
   const value = c.result?.[field];
   const busy = c.status !== "fresh";
+  const key = `${c.status}-${c.result_seq}`;
   return (
     <td className={`job ${c.status}`}>
       <motion.div
-        key={`${c.status}-${c.result_seq}`}
+        key={key}
         initial={
-          reduced || !seen.current ? false : { backgroundColor: busy ? "var(--flash-red)" : "var(--flash-blue)" }
+          reduced || key === firstKey ? false : { backgroundColor: busy ? "var(--flash-red)" : "var(--flash-blue)" }
         }
         animate={{ backgroundColor: "rgba(0,0,0,0)" }}
         transition={{ duration: 0.9 }}

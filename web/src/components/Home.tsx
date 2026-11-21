@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { fmtDate, fmtTime, fmtValue } from "@/lib/format";
 import { isCorrection, knownAt } from "@/lib/scene";
 import { signed, story } from "@/lib/story";
@@ -14,7 +14,11 @@ export function Home() {
   const { scene } = useScene();
   const versions = scene.clock.version;
   const [selected, setSelected] = useState(versions);
-  useEffect(() => setSelected(versions), [versions]);
+  const [shownLatest, setShownLatest] = useState(versions);
+  if (shownLatest !== versions) {
+    setShownLatest(versions);
+    setSelected(versions);
+  }
 
   const lanes = useMemo(
     () => [

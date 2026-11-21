@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { ledger, stored } from "@/lib/feed";
 import { fmtTime } from "@/lib/format";
 import { cents } from "@/lib/payroll";
@@ -23,7 +23,12 @@ export function Feed() {
   const latest = versions.at(-1) ?? 0;
   const [upTo, setUpTo] = useState(latest);
   const [kind, setKind] = useState<string>(KINDS[0][0]);
-  useEffect(() => setUpTo(latest), [latest]);
+  // Jump to the newest version when a new one arrives.
+  const [shownLatest, setShownLatest] = useState(latest);
+  if (shownLatest !== latest) {
+    setShownLatest(latest);
+    setUpTo(latest);
+  }
 
   const { groups, balance, count } = ledger(scene.restatements, kind, upTo);
   const now = stored(scene.computations, kind);
