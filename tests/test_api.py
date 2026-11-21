@@ -307,3 +307,45 @@ def test_error_bodies_are_json(api):
     r = api.get("/v1/computations/999999")
     assert r.status_code == 404
     assert json.loads(r.content)["error"]["code"] == "not_found"
+
+
+def test_graph_returns_reads_and_edges(api, tenant):
+    api.post("/v1/writes", hire_body())
+    api.post(
+        "/v1/writes",
+        {
+            "ops": [
+                {
+                    "op": "assert",
+                    "entity": "employee:1",
+                    "attribute": "state",
+                    "from": "2024-01-01",
+                    "value": "KA",
+                },
+                {
+                    "op": "assert",
+                    "entity": "taxrate:KA",
+                    "attribute": "withholding_bp",
+                    "from": "2024-01-01",
+                    "value": 1000,
+                },
+            ]
+        },
+    )
+    api.post("/v1/computations", {"derivation": "payroll.withholding", "keys": ["1:2024-02"]})
+    worker.drain("t", tenant_id=tenant.id)
+    g = api.get("/v1/graph", key_prefix="1:").json()
+    by_name = {c["derivation"]: c for c in g["computations"]}
+    assert set(by_name) == {"payroll.gross", "payroll.withholding"}
+    assert {r["attribute"] for r in by_name["payroll.withholding"]["reads"]} == {
+        "state",
+        "withholding_bp",
+    }
+    assert g["edges"] == [
+        {
+            "source": by_name["payroll.gross"]["id"],
+            "reader": by_name["payroll.withholding"]["id"],
+            "observed_seq": 1,
+        }
+    ]
+    assert g["truncated"] is False
