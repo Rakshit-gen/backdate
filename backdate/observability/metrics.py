@@ -17,6 +17,9 @@ write_seconds = Histogram(
     buckets=(0.001, 0.0025, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5),
 )
 invalidated = Counter("backdate_invalidated_total", "Results marked stale by writes.")
+lease_extensions = Counter(
+    "backdate_lease_extensions_total", "Leases pushed out by a heartbeat during a long compute."
+)
 computations = Counter(
     "backdate_computations_total", "Computation runs by outcome.", ["derivation", "outcome"]
 )
