@@ -430,7 +430,7 @@ td s {
   }
   .page-head,
   .split {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .steps a {
     grid-template-columns: 32px minmax(0, 1fr);
@@ -664,9 +664,13 @@ button.link:hover:not([disabled]) {
 .fence-view th {
   width: 45%;
 }
+.fence-view th,
+.fence-view td {
+  white-space: normal;
+}
 @media (max-width: 760px) {
   .fence {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -966,8 +970,10 @@ a.button:hover {
     Menlo,
     monospace;
 }
-.code-split {
-  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+@media (min-width: 761px) {
+  .code-split {
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  }
 }
 .reads {
   margin-top: 16px;
@@ -980,7 +986,7 @@ a.button:hover {
 @media (max-width: 760px) {
   .hero-head,
   .hero-controls {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .hero-tool {
     padding: 16px;
@@ -993,4 +999,9 @@ a.button:hover {
   .hero-chart .mlabel {
     font-size: 22px;
   }
+}
+
+/* Long paths like tests/test_races.py::test_name must not widen the page on phones. */
+p code {
+  overflow-wrap: anywhere;
 }
