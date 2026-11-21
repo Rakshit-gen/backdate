@@ -8,7 +8,7 @@ the same number.
 from __future__ import annotations
 
 import calendar
-from datetime import date
+from datetime import date, timedelta
 from decimal import ROUND_HALF_EVEN, Decimal
 from typing import Any
 
@@ -71,9 +71,10 @@ def gross(ctx: Context, key: str) -> dict[str, Any]:
 def withholding(ctx: Context, key: str) -> dict[str, Any]:
     """Withholding for a month, at the rate of the state on the last day."""
     entity, month = parse_key(key)
-    assert month.end is not None  # noqa: S101
     gross_result = ctx.derived("payroll.gross", key)
-    last_day = date.fromordinal(month.end.toordinal() - 1)
+    if month.end is None:  # parse_key always returns a bounded month
+        raise BadKey(key)
+    last_day = month.end - timedelta(days=1)
     state = ctx.value_at(entity, "state", last_day)
     rate_bp = ctx.value_at(taxrate_entity(state), "withholding_bp", last_day) if state else None
     rate = Decimal(rate_bp or 0)
