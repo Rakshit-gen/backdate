@@ -184,7 +184,7 @@ def mark_dependents_stale(source_id: int, version: int) -> int:
             """,
             [version, source_id],
         )
-        return cur.rowcount
+        return int(cur.rowcount)
 
 
 def delta(previous: Any, current: Any) -> Any:

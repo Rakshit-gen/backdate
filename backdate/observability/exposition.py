@@ -38,7 +38,7 @@ def metrics_view(request: HttpRequest) -> HttpResponse:
         from prometheus_client import multiprocess  # noqa: PLC0415
 
         registry = CollectorRegistry()
-        multiprocess.MultiProcessCollector(registry)
+        multiprocess.MultiProcessCollector(registry)  # type: ignore[no-untyped-call]
     else:
         registry = REGISTRY
     output = generate_latest(registry)

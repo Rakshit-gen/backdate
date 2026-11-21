@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
+from typing import Any
 
 from server.env import ConfigError, env_bool, env_int, env_list, env_str
 
@@ -73,7 +74,7 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_REFERRER_POLICY = "no-referrer"
 X_FRAME_OPTIONS = "DENY"
 
-BACKDATE = {
+BACKDATE: dict[str, Any] = {
     # How long a worker owns a claimed computation before someone else may take it.
     "LEASE_SECONDS": env_int("BACKDATE_LEASE_SECONDS", 30),
     "MAX_ATTEMPTS": env_int("BACKDATE_MAX_ATTEMPTS", 5),
