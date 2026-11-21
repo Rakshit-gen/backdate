@@ -78,6 +78,9 @@ BACKDATE: dict[str, Any] = {
     # How long a worker owns a claimed computation before someone else may take it.
     "LEASE_SECONDS": env_int("BACKDATE_LEASE_SECONDS", 30),
     "MAX_ATTEMPTS": env_int("BACKDATE_MAX_ATTEMPTS", 5),
+    # Fail a derivation that queries the database outside ctx, since nothing
+    # would record what it read. Turn off only to migrate old derivations.
+    "STRICT_READS": env_bool("BACKDATE_STRICT_READS", True),
     # Writes are refused with 503 once a tenant has this many results waiting
     # to be recomputed. 0 turns the check off.
     "MAX_STALE_BACKLOG": env_int("BACKDATE_MAX_STALE_BACKLOG", 50000),

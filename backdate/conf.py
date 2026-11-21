@@ -13,3 +13,7 @@ def get_int(name: str) -> int:
 
 def get_list(name: str) -> list[str]:
     return list(cast("list[str]", settings.BACKDATE[name]))
+
+
+def get_bool(name: str) -> bool:
+    return bool(settings.BACKDATE[name])
