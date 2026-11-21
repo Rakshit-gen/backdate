@@ -2,21 +2,11 @@
 
 import { useScene } from "./SceneProvider";
 
-/** Says where the numbers on the page come from. Always visible, never small print. */
+/** Says when the numbers on the page come from a recording rather than a running backend. */
 export function SourceNote() {
-  const { source, scene, busy } = useScene();
-  if (source.kind === "live") {
-    const c = scene.clock.computations;
-    return (
-      <div className="source live" role="status">
-        <p>
-          <strong>Live.</strong> Reading the backend at version {scene.clock.version}: {c.fresh} results fresh,{" "}
-          {c.stale + c.pending} waiting{busy ? ", workers busy" : ""}
-          {c.failed ? `, ${c.failed} failed` : ""}.
-        </p>
-      </div>
-    );
-  }
+  const { source } = useScene();
+  // Live data needs no banner; a recording must always say it is one.
+  if (source.kind === "live") return null;
   return (
     <div className="source recording" role="status">
       <p>
