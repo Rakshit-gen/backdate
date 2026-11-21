@@ -74,5 +74,4 @@ export type Scene = {
 
 export type Source =
   | { kind: "live"; scene: Scene }
-  | { kind: "recording"; scene: Scene; recordedAt: string; note: string }
-  | { kind: "unreachable"; error: string; url: string };
+  | { kind: "recording"; scene: Scene; recordedAt: string; note: string; problem?: string };
