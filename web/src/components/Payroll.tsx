@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { fmtDate } from "@/lib/format";
 import { assertFrom, cents, gross, type Piece, withholding } from "@/lib/payroll";
 import { byDerivation, knownAt, MONTHS } from "@/lib/scene";
@@ -28,6 +28,9 @@ export function Payroll() {
   const [posting, setPosting] = useState(false);
   const [result, setResult] = useState<WriteResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // Until hydration the button would submit the form natively and reload the page.
+  const [ready, setReady] = useState(false);
+  useEffect(() => setReady(true), []);
 
   const from = `2024-${String(month).padStart(2, "0")}-01`;
   const newCents = Math.round(amount * 100);
@@ -84,9 +87,9 @@ export function Payroll() {
             New annual salary
             <input
               type="number"
-              min={1}
+              min={0}
               max={1_000_000}
-              step={500}
+              step={100}
               value={amount}
               onChange={(e) => setAmount(Number(e.target.value))}
             />
@@ -103,7 +106,7 @@ export function Payroll() {
           </label>
           <div className="field">
             <span>&nbsp;</span>
-            <button type="submit" disabled={writesOff || posting || noChange || !(amount > 0)}>
+            <button type="submit" disabled={!ready || writesOff || posting || noChange || !(amount > 0)}>
               {posting ? "Posting…" : "Post correction"}
             </button>
           </div>
