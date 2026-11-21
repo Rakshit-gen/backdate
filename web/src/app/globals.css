@@ -293,35 +293,6 @@ td s {
 .reading h3 {
   margin-bottom: 6px;
 }
-.steps {
-  list-style: none;
-  margin: 16px 0 0;
-  padding: 0;
-  border-top: 1px solid var(--graphite);
-}
-.steps a {
-  display: grid;
-  grid-template-columns: 48px 180px minmax(0, 1fr);
-  align-items: baseline;
-  gap: 16px;
-  padding: 16px 0;
-  border-bottom: 1px solid var(--ruling);
-  text-decoration: none;
-}
-.steps a:hover .step-t {
-  text-decoration: underline;
-}
-.step-n {
-  font-size: 30px;
-  font-weight: 700;
-  font-stretch: 62%;
-  color: var(--muted);
-}
-.step-t {
-  font-weight: 700;
-  font-size: 19px;
-}
-
 /* ---- bitemporal chart ---- */
 .bitemporal {
   display: block;
@@ -410,12 +381,6 @@ td s {
   .page-head,
   .split {
     grid-template-columns: minmax(0, 1fr);
-  }
-  .steps a {
-    grid-template-columns: 32px minmax(0, 1fr);
-  }
-  .step-d {
-    grid-column: 2;
   }
 }
 
@@ -850,7 +815,13 @@ a.button:hover {
   height: 100%;
   display: block;
 }
+.hero-band {
+  min-height: min(84vh, 820px);
+  display: flex;
+  align-items: center;
+}
 .hero-inner {
+  width: 100%;
   position: relative;
   max-width: var(--wrap);
   margin: 0 auto;
@@ -881,4 +852,136 @@ a.button:hover {
 /* Long paths like tests/test_races.py::test_name must not widen the page on phones. */
 p code {
   overflow-wrap: anywhere;
+}
+
+.hero-months {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 10px;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 12px;
+  color: var(--muted);
+  pointer-events: none;
+}
+.hero-months li {
+  padding-left: 6px;
+}
+
+.flow {
+  list-style: none;
+  margin: 20px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border-top: 2px solid var(--graphite);
+}
+.flow li + li {
+  border-left: 1px solid var(--ruling);
+}
+.flow a {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+  height: 100%;
+  padding: 22px 20px 26px;
+  text-decoration: none;
+}
+.flow li:first-child a {
+  padding-left: 0;
+}
+.flow a:hover {
+  background: var(--sheet);
+}
+.flow-fig {
+  font-size: clamp(30px, 3.4vw, 46px);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+.flow-fig small {
+  font-size: 0.45em;
+  font-weight: 500;
+  color: var(--muted);
+  letter-spacing: 0;
+}
+.flow-fig.red {
+  color: var(--redpen);
+}
+.flow-t {
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.field {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: 20px;
+}
+.field pattern rect {
+  fill: color-mix(in oklab, var(--ruling) 70%, var(--graphite));
+  opacity: 0.55;
+}
+.field-hit {
+  fill: var(--redpen);
+}
+.field-note {
+  margin-top: 16px;
+  color: var(--muted);
+  max-width: 72ch;
+}
+.field-note strong {
+  color: var(--graphite);
+}
+
+@media (min-width: 761px) {
+  .code-split {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+  }
+}
+.code {
+  margin: 0;
+  padding: 20px 22px;
+  overflow-x: auto;
+  background: var(--sheet);
+  border: 1px solid var(--ruling);
+  border-left: 3px solid var(--carbon);
+  font:
+    14px/1.65 var(--font-mono),
+    ui-monospace,
+    monospace;
+}
+
+@media (max-width: 760px) {
+  .flow {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .flow li:nth-child(3) {
+    border-left: 0;
+  }
+  .flow li:nth-child(n + 3) {
+    border-top: 1px solid var(--ruling);
+  }
+  .flow a,
+  .flow li:first-child a {
+    padding: 18px 14px 20px 0;
+  }
+  .flow li + li a {
+    padding-left: 14px;
+  }
+  .flow li:nth-child(3) a {
+    padding-left: 0;
+  }
+  .hero-months {
+    font-size: 10px;
+  }
+  .hero-months li {
+    padding-left: 2px;
+  }
 }
