@@ -1,4 +1,5 @@
 from datetime import date, timedelta
+from itertools import pairwise
 
 import pytest
 from hypothesis import given
@@ -65,7 +66,7 @@ def test_minus_matches_day_sets(a, b):
     pieces = a.minus(b)
     covered = set().union(*(days_of(p) for p in pieces)) if pieces else set()
     assert covered == days_of(a) - days_of(b)
-    for x, y in zip(pieces, pieces[1:], strict=False):
+    for x, y in pairwise(pieces):
         assert x.end is not None and x.end < y.start
 
 
