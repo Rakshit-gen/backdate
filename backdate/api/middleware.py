@@ -11,6 +11,7 @@ from collections.abc import Callable
 from django.http import HttpRequest, HttpResponse
 from django.urls import Resolver404, resolve
 
+from backdate import tenancy
 from backdate.api import keys
 from backdate.api.errors import ApiError, Unauthorized
 from backdate.observability import logging as blog
@@ -80,7 +81,8 @@ class ApiKeyAuthMiddleware:
             return Unauthorized(str(exc)).response(request_id)
         request.principal = principal  # type: ignore[attr-defined]
         blog.bind(tenant_id=principal.tenant_id, key_id=principal.key_id)
-        return self.get_response(request)
+        with tenancy.scoped(principal.tenant_id):
+            return self.get_response(request)
 
 
 def _route(request: HttpRequest) -> str:
