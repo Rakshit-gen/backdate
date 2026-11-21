@@ -33,6 +33,12 @@ class Command(BaseCommand):
         parser.add_argument("--idle-sleep", type=float, default=0.5)
         parser.add_argument("--once", action="store_true", help="drain the queue and exit")
         parser.add_argument("--name", default=f"{socket.gethostname()}:{os.getpid()}")
+        parser.add_argument(
+            "--pace-ms",
+            type=int,
+            default=0,
+            help="sleep this long before each computation, to watch leases in a demo",
+        )
 
     def handle(self, *args: Any, **opts: Any) -> None:
         name: str = opts["name"]
@@ -57,5 +63,7 @@ class Command(BaseCommand):
                 time.sleep(opts["idle_sleep"])
                 continue
             for c in claims:
+                if opts["pace_ms"]:
+                    time.sleep(opts["pace_ms"] / 1000)
                 worker.run_one(c)
         self.stdout.write(f"worker {name} stopped")
