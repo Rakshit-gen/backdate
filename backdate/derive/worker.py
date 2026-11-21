@@ -23,7 +23,7 @@ from datetime import timedelta
 
 from django.conf import settings
 from django.db import connection, transaction
-from django.utils import timezone
+from django.db.models.expressions import RawSQL
 
 from backdate import reads
 from backdate.derive import registry
@@ -38,14 +38,14 @@ _CLAIM_SQL = """
 UPDATE backdate_computation c
    SET lease_owner = %(owner)s,
        lease_token = c.lease_token + 1,
-       lease_expires_at = now() + make_interval(secs => %(lease)s),
+       lease_expires_at = clock_timestamp() + make_interval(secs => %(lease)s),
        attempts = c.attempts + 1,
        updated_at = now()
  WHERE c.id IN (
        SELECT id FROM backdate_computation
         WHERE status IN ('pending', 'stale')
-          AND (not_before IS NULL OR not_before <= now())
-          AND (lease_expires_at IS NULL OR lease_expires_at < now())
+          AND (not_before IS NULL OR not_before <= clock_timestamp())
+          AND (lease_expires_at IS NULL OR lease_expires_at < clock_timestamp())
           {tenant_filter}
         ORDER BY not_before NULLS FIRST, id
         LIMIT %(limit)s
@@ -125,7 +125,7 @@ def _wait(claim: Claim) -> str:
         if comp is None:
             return SaveOutcome.FENCED.value
         comp.attempts = max(comp.attempts - 1, 0)
-        comp.not_before = timezone.now() + timedelta(milliseconds=200)
+        comp.not_before = db_now_plus(timedelta(milliseconds=200))
         comp.lease_owner = ""
         comp.lease_expires_at = None
         comp.save()
@@ -145,10 +145,17 @@ def _fail(claim: Claim, error: str, *, permanent: bool = False) -> str:
             comp.not_before = None
             outcome = "failed"
         else:
-            comp.not_before = timezone.now() + backoff(comp.attempts)
+            comp.not_before = db_now_plus(backoff(comp.attempts))
             outcome = "retry"
         comp.save()
     return outcome
+
+
+def db_now_plus(delay: timedelta) -> RawSQL:
+    # Database time, not app time: the claim query compares against the
+    # database clock, and app hosts can drift. clock_timestamp() rather than
+    # now() because now() is frozen at the start of the transaction.
+    return RawSQL("clock_timestamp() + make_interval(secs => %s)", [delay.total_seconds()])
 
 
 def backoff(attempts: int) -> timedelta:
