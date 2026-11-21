@@ -16,7 +16,7 @@ from server.env import ConfigError, env_bool, env_int, env_list, env_str
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 ENVIRONMENT = env_str("BACKDATE_ENV", "development")
-_DEV_SECRET = "dev-only-not-a-secret"  # noqa: S105
+_DEV_SECRET = "dev-only-not-a-secret"  # noqa: S105  # nosec B105 - refused in production below
 SECRET_KEY = env_str("DJANGO_SECRET_KEY", _DEV_SECRET)
 if ENVIRONMENT == "production" and SECRET_KEY == _DEV_SECRET:
     raise ConfigError("DJANGO_SECRET_KEY must be set in production")

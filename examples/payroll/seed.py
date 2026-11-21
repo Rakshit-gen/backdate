@@ -37,7 +37,7 @@ def employee_ops(rng: random.Random, emp: int, year: int) -> list[Assert]:
 
 def seed(tenant_id: int, plan: Plan, *, chunk: int = 150) -> list[str]:
     """Write rates and employees, request every month. Returns the keys."""
-    rng = random.Random(plan.seed)  # noqa: S311 - demo data, needs to be reproducible
+    rng = random.Random(plan.seed)  # noqa: S311  # nosec B311 - demo data, must be reproducible
     rates = [
         Assert(f"taxrate:{s}", "withholding_bp", Span(date(plan.year, 1, 1)), bp)
         for s, bp in STATES.items()
