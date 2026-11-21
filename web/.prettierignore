@@ -1,0 +1,4 @@
+tsconfig.json
+pnpm-lock.yaml
+.next
+src/data/recording.json
