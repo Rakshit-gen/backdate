@@ -1,10 +1,10 @@
 {
- "recordedAt": "2026-11-21T17:22:16.405Z",
- "note": "It has 20 seeded employees and 2 corrections to employee 7: v3 changed the salary from 1 Mar 2024, v4 changed the salary from 1 Jun 2024. Workers recomputed after each one.",
+ "recordedAt": "2026-11-21T17:23:50.624Z",
+ "note": "It has 20 seeded employees and 3 corrections to employee 7: v3 changed the salary from 1 Mar 2024, v4 changed the salary from 1 Jun 2024, v5 changed the salary from 1 Sept 2024. Workers recomputed after each one.",
  "scene": {
   "employee": 7,
   "clock": {
-   "version": 4,
+   "version": 5,
    "computations": {
     "pending": 0,
     "fresh": 480,
@@ -42,6 +42,20 @@
      "to": null,
      "value": 7800000,
      "tx_from": 4,
+     "tx_to": 5
+    },
+    {
+     "from": "2024-06-01",
+     "to": "2024-09-01",
+     "value": 7800000,
+     "tx_from": 5,
+     "tx_to": null
+    },
+    {
+     "from": "2024-09-01",
+     "to": null,
+     "value": 8100000,
+     "tx_from": 5,
      "tx_to": null
     }
    ]
@@ -73,7 +87,7 @@
    ]
   },
   "graph": {
-   "version": 4,
+   "version": 5,
    "computations": [
     {
      "id": 205,
@@ -362,19 +376,19 @@
      "status": "fresh",
      "result": {
       "days_paid": 30,
-      "gross_cents": 512877
+      "gross_cents": 532603
      },
-     "result_version": 4,
-     "result_seq": 3,
+     "result_version": 5,
+     "result_seq": 4,
      "stale_since_version": null,
      "attempts": 0,
      "last_error": "",
      "lease": {
       "owner": "",
-      "token": 3,
+      "token": 4,
       "expires_at": null
      },
-     "updated_at": "2026-11-21T17:14:33.846577+00:00",
+     "updated_at": "2026-11-21T17:23:28.708715+00:00",
      "reads": [
       {
        "entity": "employee:7",
@@ -397,19 +411,19 @@
      "status": "fresh",
      "result": {
       "days_paid": 31,
-      "gross_cents": 529973
+      "gross_cents": 550356
      },
-     "result_version": 4,
-     "result_seq": 3,
+     "result_version": 5,
+     "result_seq": 4,
      "stale_since_version": null,
      "attempts": 0,
      "last_error": "",
      "lease": {
       "owner": "",
-      "token": 3,
+      "token": 4,
       "expires_at": null
      },
-     "updated_at": "2026-11-21T17:14:34.137886+00:00",
+     "updated_at": "2026-11-21T17:23:28.852745+00:00",
      "reads": [
       {
        "entity": "employee:7",
@@ -432,19 +446,19 @@
      "status": "fresh",
      "result": {
       "days_paid": 30,
-      "gross_cents": 512877
+      "gross_cents": 532603
      },
-     "result_version": 4,
-     "result_seq": 3,
+     "result_version": 5,
+     "result_seq": 4,
      "stale_since_version": null,
      "attempts": 0,
      "last_error": "",
      "lease": {
       "owner": "",
-      "token": 3,
+      "token": 4,
       "expires_at": null
      },
-     "updated_at": "2026-11-21T17:14:33.709478+00:00",
+     "updated_at": "2026-11-21T17:23:28.636668+00:00",
      "reads": [
       {
        "entity": "employee:7",
@@ -467,19 +481,19 @@
      "status": "fresh",
      "result": {
       "days_paid": 31,
-      "gross_cents": 529973
+      "gross_cents": 550356
      },
-     "result_version": 4,
-     "result_seq": 3,
+     "result_version": 5,
+     "result_seq": 4,
      "stale_since_version": null,
      "attempts": 0,
      "last_error": "",
      "lease": {
       "owner": "",
-      "token": 3,
+      "token": 4,
       "expires_at": null
      },
-     "updated_at": "2026-11-21T17:14:33.496563+00:00",
+     "updated_at": "2026-11-21T17:23:28.498619+00:00",
      "reads": [
       {
        "entity": "employee:7",
@@ -779,19 +793,19 @@
      "result": {
       "state": "MH",
       "rate_bp": 1200,
-      "withholding_cents": 61545
+      "withholding_cents": 63912
      },
-     "result_version": 4,
-     "result_seq": 3,
+     "result_version": 5,
+     "result_seq": 4,
      "stale_since_version": null,
      "attempts": 0,
      "last_error": "",
      "lease": {
       "owner": "",
-      "token": 3,
+      "token": 5,
       "expires_at": null
      },
-     "updated_at": "2026-11-21T17:14:34.655162+00:00",
+     "updated_at": "2026-11-21T17:23:29.080706+00:00",
      "reads": [
       {
        "entity": "employee:7",
@@ -815,19 +829,19 @@
      "result": {
       "state": "MH",
       "rate_bp": 1200,
-      "withholding_cents": 63597
+      "withholding_cents": 66043
      },
-     "result_version": 4,
-     "result_seq": 3,
+     "result_version": 5,
+     "result_seq": 4,
      "stale_since_version": null,
      "attempts": 0,
      "last_error": "",
      "lease": {
       "owner": "",
-      "token": 3,
+      "token": 5,
       "expires_at": null
      },
-     "updated_at": "2026-11-21T17:14:34.437295+00:00",
+     "updated_at": "2026-11-21T17:23:28.932679+00:00",
      "reads": [
       {
        "entity": "employee:7",
@@ -851,19 +865,19 @@
      "result": {
       "state": "MH",
       "rate_bp": 1200,
-      "withholding_cents": 61545
+      "withholding_cents": 63912
      },
-     "result_version": 4,
-     "result_seq": 3,
+     "result_version": 5,
+     "result_seq": 4,
      "stale_since_version": null,
      "attempts": 0,
      "last_error": "",
      "lease": {
       "owner": "",
-      "token": 3,
+      "token": 5,
       "expires_at": null
      },
-     "updated_at": "2026-11-21T17:14:34.219388+00:00",
+     "updated_at": "2026-11-21T17:23:29.007656+00:00",
      "reads": [
       {
        "entity": "employee:7",
@@ -887,19 +901,19 @@
      "result": {
       "state": "MH",
       "rate_bp": 1200,
-      "withholding_cents": 63597
+      "withholding_cents": 66043
      },
-     "result_version": 4,
-     "result_seq": 3,
+     "result_version": 5,
+     "result_seq": 4,
      "stale_since_version": null,
      "attempts": 0,
      "last_error": "",
      "lease": {
       "owner": "",
-      "token": 3,
+      "token": 4,
       "expires_at": null
      },
-     "updated_at": "2026-11-21T17:14:34.582864+00:00",
+     "updated_at": "2026-11-21T17:23:28.780084+00:00",
      "reads": [
       {
        "entity": "employee:7",
@@ -943,11 +957,6 @@
      "observed_seq": 2
     },
     {
-     "source": 215,
-     "reader": 455,
-     "observed_seq": 3
-    },
-    {
      "source": 211,
      "reader": 451,
      "observed_seq": 3
@@ -958,11 +967,6 @@
      "observed_seq": 3
     },
     {
-     "source": 214,
-     "reader": 454,
-     "observed_seq": 3
-    },
-    {
      "source": 212,
      "reader": 452,
      "observed_seq": 3
@@ -970,12 +974,22 @@
     {
      "source": 216,
      "reader": 456,
-     "observed_seq": 3
+     "observed_seq": 4
+    },
+    {
+     "source": 214,
+     "reader": 454,
+     "observed_seq": 4
+    },
+    {
+     "source": 215,
+     "reader": 455,
+     "observed_seq": 4
     },
     {
      "source": 213,
      "reader": 453,
-     "observed_seq": 3
+     "observed_seq": 4
     }
    ],
    "truncated": false
@@ -1156,19 +1170,19 @@
     "status": "fresh",
     "result": {
      "days_paid": 30,
-     "gross_cents": 512877
+     "gross_cents": 532603
     },
-    "result_version": 4,
-    "result_seq": 3,
+    "result_version": 5,
+    "result_seq": 4,
     "stale_since_version": null,
     "attempts": 0,
     "last_error": "",
     "lease": {
      "owner": "",
-     "token": 3,
+     "token": 4,
      "expires_at": null
     },
-    "updated_at": "2026-11-21T17:14:33.846577+00:00"
+    "updated_at": "2026-11-21T17:23:28.708715+00:00"
    },
    {
     "id": 214,
@@ -1177,19 +1191,19 @@
     "status": "fresh",
     "result": {
      "days_paid": 31,
-     "gross_cents": 529973
+     "gross_cents": 550356
     },
-    "result_version": 4,
-    "result_seq": 3,
+    "result_version": 5,
+    "result_seq": 4,
     "stale_since_version": null,
     "attempts": 0,
     "last_error": "",
     "lease": {
      "owner": "",
-     "token": 3,
+     "token": 4,
      "expires_at": null
     },
-    "updated_at": "2026-11-21T17:14:34.137886+00:00"
+    "updated_at": "2026-11-21T17:23:28.852745+00:00"
    },
    {
     "id": 215,
@@ -1198,19 +1212,19 @@
     "status": "fresh",
     "result": {
      "days_paid": 30,
-     "gross_cents": 512877
+     "gross_cents": 532603
     },
-    "result_version": 4,
-    "result_seq": 3,
+    "result_version": 5,
+    "result_seq": 4,
     "stale_since_version": null,
     "attempts": 0,
     "last_error": "",
     "lease": {
      "owner": "",
-     "token": 3,
+     "token": 4,
      "expires_at": null
     },
-    "updated_at": "2026-11-21T17:14:33.709478+00:00"
+    "updated_at": "2026-11-21T17:23:28.636668+00:00"
    },
    {
     "id": 216,
@@ -1219,19 +1233,19 @@
     "status": "fresh",
     "result": {
      "days_paid": 31,
-     "gross_cents": 529973
+     "gross_cents": 550356
     },
-    "result_version": 4,
-    "result_seq": 3,
+    "result_version": 5,
+    "result_seq": 4,
     "stale_since_version": null,
     "attempts": 0,
     "last_error": "",
     "lease": {
      "owner": "",
-     "token": 3,
+     "token": 4,
      "expires_at": null
     },
-    "updated_at": "2026-11-21T17:14:33.496563+00:00"
+    "updated_at": "2026-11-21T17:23:28.498619+00:00"
    },
    {
     "id": 445,
@@ -1417,19 +1431,19 @@
     "result": {
      "state": "MH",
      "rate_bp": 1200,
-     "withholding_cents": 61545
+     "withholding_cents": 63912
     },
-    "result_version": 4,
-    "result_seq": 3,
+    "result_version": 5,
+    "result_seq": 4,
     "stale_since_version": null,
     "attempts": 0,
     "last_error": "",
     "lease": {
      "owner": "",
-     "token": 3,
+     "token": 5,
      "expires_at": null
     },
-    "updated_at": "2026-11-21T17:14:34.655162+00:00"
+    "updated_at": "2026-11-21T17:23:29.080706+00:00"
    },
    {
     "id": 454,
@@ -1439,19 +1453,19 @@
     "result": {
      "state": "MH",
      "rate_bp": 1200,
-     "withholding_cents": 63597
+     "withholding_cents": 66043
     },
-    "result_version": 4,
-    "result_seq": 3,
+    "result_version": 5,
+    "result_seq": 4,
     "stale_since_version": null,
     "attempts": 0,
     "last_error": "",
     "lease": {
      "owner": "",
-     "token": 3,
+     "token": 5,
      "expires_at": null
     },
-    "updated_at": "2026-11-21T17:14:34.437295+00:00"
+    "updated_at": "2026-11-21T17:23:28.932679+00:00"
    },
    {
     "id": 455,
@@ -1461,19 +1475,19 @@
     "result": {
      "state": "MH",
      "rate_bp": 1200,
-     "withholding_cents": 61545
+     "withholding_cents": 63912
     },
-    "result_version": 4,
-    "result_seq": 3,
+    "result_version": 5,
+    "result_seq": 4,
     "stale_since_version": null,
     "attempts": 0,
     "last_error": "",
     "lease": {
      "owner": "",
-     "token": 3,
+     "token": 5,
      "expires_at": null
     },
-    "updated_at": "2026-11-21T17:14:34.219388+00:00"
+    "updated_at": "2026-11-21T17:23:29.007656+00:00"
    },
    {
     "id": 456,
@@ -1483,19 +1497,19 @@
     "result": {
      "state": "MH",
      "rate_bp": 1200,
-     "withholding_cents": 63597
+     "withholding_cents": 66043
     },
-    "result_version": 4,
-    "result_seq": 3,
+    "result_version": 5,
+    "result_seq": 4,
     "stale_since_version": null,
     "attempts": 0,
     "last_error": "",
     "lease": {
      "owner": "",
-     "token": 3,
+     "token": 4,
      "expires_at": null
     },
-    "updated_at": "2026-11-21T17:14:34.582864+00:00"
+    "updated_at": "2026-11-21T17:23:28.780084+00:00"
    }
   ],
   "restatements": [
@@ -2772,6 +2786,190 @@
      "withholding_cents": 3945
     },
     "created_at": "2026-11-21T17:14:34.654647+00:00"
+   },
+   {
+    "computation": {
+     "id": 216,
+     "derivation": "payroll.gross",
+     "key": "7:2024-12"
+    },
+    "seq": 4,
+    "from_version": 4,
+    "to_version": 5,
+    "previous": {
+     "days_paid": 31,
+     "gross_cents": 529973
+    },
+    "current": {
+     "days_paid": 31,
+     "gross_cents": 550356
+    },
+    "delta": {
+     "gross_cents": 20383
+    },
+    "created_at": "2026-11-21T17:23:28.497664+00:00"
+   },
+   {
+    "computation": {
+     "id": 215,
+     "derivation": "payroll.gross",
+     "key": "7:2024-11"
+    },
+    "seq": 4,
+    "from_version": 4,
+    "to_version": 5,
+    "previous": {
+     "days_paid": 30,
+     "gross_cents": 512877
+    },
+    "current": {
+     "days_paid": 30,
+     "gross_cents": 532603
+    },
+    "delta": {
+     "gross_cents": 19726
+    },
+    "created_at": "2026-11-21T17:23:28.636297+00:00"
+   },
+   {
+    "computation": {
+     "id": 213,
+     "derivation": "payroll.gross",
+     "key": "7:2024-09"
+    },
+    "seq": 4,
+    "from_version": 4,
+    "to_version": 5,
+    "previous": {
+     "days_paid": 30,
+     "gross_cents": 512877
+    },
+    "current": {
+     "days_paid": 30,
+     "gross_cents": 532603
+    },
+    "delta": {
+     "gross_cents": 19726
+    },
+    "created_at": "2026-11-21T17:23:28.708156+00:00"
+   },
+   {
+    "computation": {
+     "id": 456,
+     "derivation": "payroll.withholding",
+     "key": "7:2024-12"
+    },
+    "seq": 4,
+    "from_version": 4,
+    "to_version": 5,
+    "previous": {
+     "state": "MH",
+     "rate_bp": 1200,
+     "withholding_cents": 63597
+    },
+    "current": {
+     "state": "MH",
+     "rate_bp": 1200,
+     "withholding_cents": 66043
+    },
+    "delta": {
+     "withholding_cents": 2446
+    },
+    "created_at": "2026-11-21T17:23:28.779612+00:00"
+   },
+   {
+    "computation": {
+     "id": 214,
+     "derivation": "payroll.gross",
+     "key": "7:2024-10"
+    },
+    "seq": 4,
+    "from_version": 4,
+    "to_version": 5,
+    "previous": {
+     "days_paid": 31,
+     "gross_cents": 529973
+    },
+    "current": {
+     "days_paid": 31,
+     "gross_cents": 550356
+    },
+    "delta": {
+     "gross_cents": 20383
+    },
+    "created_at": "2026-11-21T17:23:28.852319+00:00"
+   },
+   {
+    "computation": {
+     "id": 454,
+     "derivation": "payroll.withholding",
+     "key": "7:2024-10"
+    },
+    "seq": 4,
+    "from_version": 4,
+    "to_version": 5,
+    "previous": {
+     "state": "MH",
+     "rate_bp": 1200,
+     "withholding_cents": 63597
+    },
+    "current": {
+     "state": "MH",
+     "rate_bp": 1200,
+     "withholding_cents": 66043
+    },
+    "delta": {
+     "withholding_cents": 2446
+    },
+    "created_at": "2026-11-21T17:23:28.931994+00:00"
+   },
+   {
+    "computation": {
+     "id": 455,
+     "derivation": "payroll.withholding",
+     "key": "7:2024-11"
+    },
+    "seq": 4,
+    "from_version": 4,
+    "to_version": 5,
+    "previous": {
+     "state": "MH",
+     "rate_bp": 1200,
+     "withholding_cents": 61545
+    },
+    "current": {
+     "state": "MH",
+     "rate_bp": 1200,
+     "withholding_cents": 63912
+    },
+    "delta": {
+     "withholding_cents": 2367
+    },
+    "created_at": "2026-11-21T17:23:29.007230+00:00"
+   },
+   {
+    "computation": {
+     "id": 453,
+     "derivation": "payroll.withholding",
+     "key": "7:2024-09"
+    },
+    "seq": 4,
+    "from_version": 4,
+    "to_version": 5,
+    "previous": {
+     "state": "MH",
+     "rate_bp": 1200,
+     "withholding_cents": 61545
+    },
+    "current": {
+     "state": "MH",
+     "rate_bp": 1200,
+     "withholding_cents": 63912
+    },
+    "delta": {
+     "withholding_cents": 2367
+    },
+    "created_at": "2026-11-21T17:23:29.080270+00:00"
    }
   ],
   "changesets": [
@@ -3167,6 +3365,20 @@
       "entity": "employee:7",
       "attribute": "annual_salary_cents",
       "from": "2024-06-01",
+      "to": null
+     }
+    ]
+   },
+   {
+    "version": 5,
+    "recorded_at": "2026-11-21T17:23:28.250852+00:00",
+    "actor": "key:1",
+    "reason": "salary correction from the web demo",
+    "changes": [
+     {
+      "entity": "employee:7",
+      "attribute": "annual_salary_cents",
+      "from": "2024-09-01",
       "to": null
      }
     ]
