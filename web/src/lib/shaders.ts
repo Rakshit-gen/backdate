@@ -41,17 +41,17 @@ export const sheetFrag = /* glsl */ `
   }
 `;
 
-/** Ink printed on a sheet. Open-ended ranges fade out past 31 December. */
+/** Ink printed on a sheet. Open-ended ranges fade out from uFadeFrom (in the quad's own u). */
 export const inkFrag = /* glsl */ `
   uniform vec3 uColor;
   uniform float uOpacity;
-  uniform float uOpenEnd;
+  uniform float uFadeFrom;
   uniform float uSeed;
   varying vec2 vUv;
   ${noise}
   void main() {
     float press = 0.82 + 0.18 * grain(vUv * vec2(90.0, 18.0) + uSeed);
-    float fade = uOpenEnd > 0.5 ? 1.0 - smoothstep(0.6, 1.0, vUv.x) : 1.0;
+    float fade = uFadeFrom < 1.0 ? 1.0 - smoothstep(uFadeFrom, 1.0, vUv.x) : 1.0;
     gl_FragColor = vec4(uColor, uOpacity * press * fade);
   }
 `;
