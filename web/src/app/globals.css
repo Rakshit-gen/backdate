@@ -208,3 +208,27 @@ td.picked { background: color-mix(in oklab, var(--carbon) 9%, transparent); }
 button.link { background: none; border: 0; padding: 0; font-weight: 400; color: var(--redpen); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
 button.link:hover:not([disabled]) { background: none; color: var(--carbon); }
 .detail { position: sticky; top: 24px; align-self: start; }
+
+/* ---- workers ---- */
+:root { --flash-red: color-mix(in srgb, var(--redpen) 30%, transparent); --flash-blue: color-mix(in srgb, var(--carbon) 25%, transparent); }
+.jobs th, .jobs td { padding: 0; border-bottom: 1px solid var(--ruling); vertical-align: top; }
+.jobs thead th { padding: 6px 8px 6px 0; }
+.jobs tbody th { padding: 10px 12px 10px 0; color: var(--graphite); font-size: 15px; }
+.jobs { max-width: 760px; }
+.job-in { display: grid; grid-template-columns: 110px 1fr; align-items: baseline; gap: 0 12px; padding: 7px 10px; border-left: 3px solid var(--ruling); }
+.job-m { grid-column: 2; }
+.job.stale .job-in, .job.pending .job-in { border-left-color: var(--redpen); }
+.job.failed .job-in { border-left-color: var(--redpen); background: color-mix(in oklab, var(--redpen) 10%, transparent); }
+.job-v { font-weight: 600; font-size: 15px; }
+.job-s { font-size: 13px; color: var(--muted); }
+.job.stale .job-s, .job.pending .job-s { color: var(--redpen); }
+.job-m { font-size: 12px; font-stretch: 80%; color: var(--muted); }
+.fence { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 24px 48px; margin-top: 16px; }
+.fence-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.fence-steps button { width: 100%; text-align: left; font-weight: 500; border-color: transparent; border-left: 3px solid var(--ruling); }
+.fence-steps button[aria-pressed="true"] { border-left-color: var(--carbon); }
+.fence-view { border-top: 2px solid var(--graphite); padding-top: 16px; }
+.fence-view h3 { margin-bottom: 6px; }
+.fence-view table { margin: 8px 0 20px; }
+.fence-view th { width: 45%; }
+@media (max-width: 760px) { .fence { grid-template-columns: 1fr; } }
