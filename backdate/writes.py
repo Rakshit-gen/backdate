@@ -24,10 +24,9 @@ from collections.abc import Sequence
 from dataclasses import dataclass, field
 from typing import Any
 
-from django.conf import settings
 from django.db import connection, transaction
 
-from backdate import clock
+from backdate import clock, conf
 from backdate.intervals import Span, parse_span
 from backdate.models import ChangeRange, Changeset, Fact, IdempotencyRecord
 from backdate.timeline import Timeline, assert_value, changed_spans, retract
@@ -144,7 +143,7 @@ def apply(
 def _validate(ops: Sequence[Op]) -> None:
     if not ops:
         raise WriteError("a write needs at least one operation")
-    limit = settings.BACKDATE["MAX_OPS_PER_CHANGESET"]
+    limit = conf.get_int("MAX_OPS_PER_CHANGESET")
     if len(ops) > limit:
         raise WriteError(f"at most {limit} operations per write, got {len(ops)}")
     for op in ops:
@@ -303,7 +302,7 @@ def invalidate(tenant_id: int, version: int, changes: Sequence[Change]) -> int:
                 "ranges": [_range_literal(c.span) for c in changes],
             },
         )
-        return cur.rowcount
+        return int(cur.rowcount)
 
 
 def _range_literal(span: Span) -> str:

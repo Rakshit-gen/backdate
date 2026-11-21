@@ -14,7 +14,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
-from django.conf import settings
+from backdate import conf
 
 if TYPE_CHECKING:
     from backdate.derive.context import Context
@@ -73,5 +73,5 @@ def all_derivations() -> list[Derivation]:
 
 
 def load_configured_modules() -> None:
-    for module in settings.BACKDATE["DERIVATION_MODULES"]:
+    for module in conf.get_list("DERIVATION_MODULES"):
         importlib.import_module(module)

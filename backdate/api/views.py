@@ -13,13 +13,12 @@ from datetime import date
 from functools import wraps
 from typing import Any
 
-from django.conf import settings
 from django.core.exceptions import RequestDataTooBig
 from django.db import connection
 from django.db.models import Count
 from django.http import HttpRequest, JsonResponse
 
-from backdate import reads, writes
+from backdate import conf, reads, writes
 from backdate.api.errors import (
     BadRequest,
     Conflict,
@@ -148,7 +147,7 @@ def _parse_ops(body: Any) -> list[writes.Op]:
 
 
 def _check_backlog(tenant_id: int) -> None:
-    limit = settings.BACKDATE["MAX_STALE_BACKLOG"]
+    limit = conf.get_int("MAX_STALE_BACKLOG")
     if not limit:
         return
     waiting = Computation.objects.filter(
@@ -400,10 +399,7 @@ def computation(request: HttpRequest, tenant_id: int, computation_id: int) -> Js
     body["dependents"] = list(
         DerivedRead.objects.filter(source=c).values_list("reader_id", flat=True)
     )
-    body["restatements"] = [
-        _restatement_json(r)
-        for r in c.restatements.order_by("seq")  # type: ignore[attr-defined]
-    ]
+    body["restatements"] = [_restatement_json(r) for r in c.restatements.order_by("seq")]
     return JsonResponse(body)
 
 

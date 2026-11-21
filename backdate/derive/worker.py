@@ -21,11 +21,10 @@ from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import timedelta
 
-from django.conf import settings
 from django.db import connection, transaction
 from django.db.models.expressions import RawSQL
 
-from backdate import reads
+from backdate import conf, reads
 from backdate.derive import registry
 from backdate.derive.context import Context, NotReady
 from backdate.derive.save import Claim, SaveOutcome, save
@@ -61,7 +60,7 @@ def claim(owner: str, limit: int = 10, tenant_id: int | None = None) -> list[Cla
             sql,
             {
                 "owner": owner,
-                "lease": settings.BACKDATE["LEASE_SECONDS"],
+                "lease": conf.get_int("LEASE_SECONDS"),
                 "limit": limit,
                 "tenant": tenant_id,
             },
@@ -140,7 +139,7 @@ def _fail(claim: Claim, error: str, *, permanent: bool = False) -> str:
         comp.last_error = error[:4000]
         comp.lease_owner = ""
         comp.lease_expires_at = None
-        if permanent or comp.attempts >= settings.BACKDATE["MAX_ATTEMPTS"]:
+        if permanent or comp.attempts >= conf.get_int("MAX_ATTEMPTS"):
             comp.status = Computation.Status.FAILED
             comp.not_before = None
             outcome = "failed"
@@ -186,7 +185,7 @@ def request(tenant_id: int, derivation: str, keys: Iterable[str]) -> int:
             """,
             [tenant_id, derivation, unique],
         )
-        return cur.rowcount
+        return int(cur.rowcount)
 
 
 def drain(
