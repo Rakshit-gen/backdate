@@ -8,15 +8,26 @@ if (!res.ok) throw new Error(`${res.status} ${await res.text()}`);
 const scene = await res.json();
 const recordedAt = new Date().toISOString();
 type Change = { attribute: string; from: string };
+const NAMES: Record<string, string> = { annual_salary_cents: "salary", fte_bp: "FTE", state: "state" };
+const day = (iso: string) =>
+  new Date(`${iso}T00:00:00Z`).toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC",
+  });
 const corrections = (scene.changesets as { version: number; changes: Change[] }[])
   .slice(1)
-  .map((c) => `v${c.version} changes ${c.changes.map((x) => `${x.attribute} from ${x.from}`).join(", ")}`);
+  .map(
+    (c) =>
+      `v${c.version} changed the ${c.changes.map((x) => `${NAMES[x.attribute] ?? x.attribute} from ${day(x.from)}`).join(" and ")}`,
+  );
+// Every employee has 12 gross and 12 withholding results.
+const employees = (Object.values(scene.clock.computations) as number[]).reduce((a, b) => a + b, 0) / 24;
 const note =
-  `Recorded from a real run at version ${scene.clock.version}: seeded employees, then ` +
-  (corrections.length
-    ? `these corrections to employee ${scene.employee}: ${corrections.join("; ")}. `
-    : "no corrections. ") +
-  "Workers recomputed after each one. Nothing in it is made up.";
+  `It has ${employees} seeded employees and ${corrections.length} corrections to employee ${scene.employee}` +
+  (corrections.length ? `: ${corrections.join(", ")}` : "") +
+  ". Workers recomputed after each one.";
 writeFileSync(
   new URL("../src/data/recording.json", import.meta.url),
   JSON.stringify({ recordedAt, note, scene }, null, 1) + "\n",

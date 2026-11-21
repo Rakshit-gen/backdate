@@ -20,8 +20,9 @@ export function SourceNote() {
   return (
     <div className="source recording" role="status">
       <p>
-        <strong>Recording.</strong> No backend is connected, so this page shows a capture of a real run from{" "}
-        {new Date(source.recordedAt).toUTCString()}. {source.note}
+        <strong>Recording.</strong> No backend is connected, so this page shows a capture of a real run made on{" "}
+        {new Date(source.recordedAt).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" })}.{" "}
+        {source.note}
         {source.problem ? <> The backend was configured but failed: {source.problem}.</> : null} To make it live, run{" "}
         <code>web/scripts/backend.sh --fresh</code> and then <code>pnpm dev</code>.
       </p>

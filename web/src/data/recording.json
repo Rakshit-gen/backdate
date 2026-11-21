@@ -1,6 +1,6 @@
 {
- "recordedAt": "2026-11-21T17:19:24.341Z",
- "note": "Recorded from a real run at version 4: seeded employees, then these corrections to employee 7: v3 changes annual_salary_cents from 2024-03-01; v4 changes annual_salary_cents from 2024-06-01. Workers recomputed after each one. Nothing in it is made up.",
+ "recordedAt": "2026-11-21T17:22:16.405Z",
+ "note": "It has 20 seeded employees and 2 corrections to employee 7: v3 changed the salary from 1 Mar 2024, v4 changed the salary from 1 Jun 2024. Workers recomputed after each one.",
  "scene": {
   "employee": 7,
   "clock": {

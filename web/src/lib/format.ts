@@ -22,5 +22,6 @@ export function fmtValue(attribute: string, value: unknown): string {
 }
 
 export function fmtTime(iso: string): string {
-  return new Date(iso).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+  // UTC, so the server and the browser render the same text.
+  return `${new Date(iso).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit", timeZone: "UTC" })} UTC`;
 }
