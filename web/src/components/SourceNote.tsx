@@ -8,19 +8,19 @@ export function SourceNote() {
   if (source.kind === "live") {
     const c = scene.clock.computations;
     return (
-      <p className="source live" role="status">
+      <div className="source live" role="status"><p>
         <strong>Live.</strong> Reading the backend at version {scene.clock.version}: {c.fresh} results
         fresh, {c.stale + c.pending} waiting{busy ? ", workers busy" : ""}
         {c.failed ? `, ${c.failed} failed` : ""}.
-      </p>
+      </p></div>
     );
   }
   return (
-    <p className="source recording" role="status">
+    <div className="source recording" role="status"><p>
       <strong>Recording.</strong> No backend is connected, so this page shows a capture of a real run
       from {new Date(source.recordedAt).toUTCString()}. {source.note}
       {source.problem ? <> The backend was configured but failed: {source.problem}.</> : null} To make it
       live, run <code>web/scripts/backend.sh --fresh</code> and then <code>pnpm dev</code>.
-    </p>
+    </p></div>
   );
 }
