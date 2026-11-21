@@ -2,7 +2,7 @@ import { expect, type Page, test } from "@playwright/test";
 import recording from "../src/data/recording.json" with { type: "json" };
 
 const PAGES = [
-  ["/", "backdate"],
+  ["/", "Fix a fact in the past. Recompute only what read it."],
   ["/payroll", "Payroll"],
   ["/invalidation", "Invalidation"],
   ["/workers", "Workers"],
@@ -93,4 +93,12 @@ test("the proxy only reads allowlisted paths and refuses writes here", async ({ 
     data: { employee: 7, from: "2024-05-01", salary_cents: 8_000_000 },
   });
   expect(write.status()).toBe(403);
+});
+
+test("the landing raise carries over to the payroll page", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator(".hero-result")).toContainText("results and leave the rest alone");
+  await page.getByRole("link", { name: "Post this raise" }).click();
+  await expect(page).toHaveURL(/\/payroll\?from=6&salary=\d+/);
+  await expect(page.locator('select, input[type="month"]').first()).toBeVisible();
 });
