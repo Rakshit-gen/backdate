@@ -5,12 +5,12 @@ import { useMemo, useSyncExternalStore } from "react";
 export type Tokens = { paper: string; sheet: string; ruling: string; graphite: string; carbon: string; redpen: string };
 
 const FALLBACK: Tokens = {
-  paper: "#edf1e7",
-  sheet: "#f6f8f2",
-  ruling: "#c9d6c3",
-  graphite: "#262820",
-  carbon: "#2b3a9c",
-  redpen: "#c0281a",
+  paper: "#0d1124",
+  sheet: "#141932",
+  ruling: "#252d50",
+  graphite: "#e4e8f6",
+  carbon: "#9fb0ff",
+  redpen: "#ff7b6c",
 };
 
 function read(): Tokens {
@@ -56,13 +56,11 @@ export const useHydrated = () =>
     () => false,
   );
 
-/** The page's colour tokens, kept in sync with the colour scheme, for use in WebGL. */
+/** The page's colour tokens, read from CSS once hydrated, for use in WebGL. */
 export function useTokens(): Tokens {
-  const dark = useMedia("(prefers-color-scheme: dark)");
   const hydrated = useHydrated();
   // Tokens go to WebGL uniforms, never into markup, so reading the DOM here can't cause a mismatch.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  return useMemo(() => (hydrated ? read() : FALLBACK), [dark, hydrated]);
+  return useMemo(() => (hydrated ? read() : FALLBACK), [hydrated]);
 }
 
 export const useReducedMotion = () => useMedia("(prefers-reduced-motion: reduce)");
