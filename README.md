@@ -65,9 +65,10 @@ There is also a `compose.yaml` with Postgres, the API and two workers. I have no
 ```python
 from backdate.derive.registry import derivation
 
+
 @derivation("payroll.gross", version="1")
 def gross(ctx, key):
-    entity, month = parse_key(key)                   # "7:2024-03"
+    entity, month = parse_key(key)  # "7:2024-03"
     salary = ctx.timeline(entity, "annual_salary_cents", month)
     fte = ctx.timeline(entity, "fte_bp", month)
     ...
