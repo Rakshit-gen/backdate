@@ -56,7 +56,8 @@ export type WriteResult = {
   version: number;
   noop: boolean;
   invalidated: number;
-  changes: (Span & { entity: string; attribute: string })[];
+  // writes.WriteResult.as_json names these start/end, unlike the read endpoints.
+  changes: { entity: string; attribute: string; start: string; end: string | null }[];
 };
 
 /** Everything the page renders for one employee. */

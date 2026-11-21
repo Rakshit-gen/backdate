@@ -60,3 +60,8 @@ export function byDerivation(comps: Computation[], name: string): (Computation |
   for (const c of comps) if (c.derivation === name) out[monthOf(c.key)] = c;
   return out;
 }
+
+/** A row first written at v, replacing something already known: a correction. */
+export function isCorrection(rows: HistoryRow[], row: HistoryRow, v: number): boolean {
+  return row.tx_from === v && knownAt(rows, v - 1).length > 0;
+}
