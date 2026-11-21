@@ -29,7 +29,7 @@ for (const [path, title] of PAGES) {
   });
 
   test(`${path} fits a phone screen`, async ({ page }) => {
-    await page.setViewportSize({ width: 390, height: 844 });
+    await page.setViewportSize({ width: 320, height: 720 });
     await page.goto(path);
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
     expect(overflow).toBe(0);
