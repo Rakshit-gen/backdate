@@ -1,0 +1,53 @@
+# Local stack: Postgres, API, two workers. Not run on the author's machine.
+#   docker compose up --build
+#   docker compose run --rm api python manage.py create_tenant demo
+services:
+  db:
+    image: postgres:18
+    environment:
+      POSTGRES_USER: backdate
+      POSTGRES_PASSWORD: backdate
+      POSTGRES_DB: backdate
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U backdate"]
+      interval: 2s
+      retries: 30
+    volumes:
+      - pgdata:/var/lib/postgresql
+
+  migrate:
+    build: .
+    command: ["python", "manage.py", "migrate"]
+    environment: &env
+      PGHOST: db
+      PGPORT: "5432"
+      PGUSER: backdate
+      PGPASSWORD: backdate
+      PGDATABASE: backdate
+      DJANGO_SECRET_KEY: compose-only-change-me
+      DJANGO_ALLOWED_HOSTS: localhost,127.0.0.1
+    depends_on:
+      db:
+        condition: service_healthy
+
+  api:
+    build: .
+    environment: *env
+    ports: ["8000:8000"]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
+  worker:
+    build: .
+    command: ["python", "manage.py", "backdate_worker"]
+    environment: *env
+    deploy:
+      replicas: 2
+    stop_grace_period: 30s
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
+volumes:
+  pgdata:
