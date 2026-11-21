@@ -38,6 +38,7 @@ export const sheetFrag = /* glsl */ `
     vec3 col = uPaper * (0.965 + 0.05 * g);
     col = mix(col, uRuling, max(monthRule * 0.55, max(lane * 0.35, edge)));
     gl_FragColor = vec4(col, uOpacity);
+    #include <colorspace_fragment>
   }
 `;
 
@@ -53,5 +54,6 @@ export const inkFrag = /* glsl */ `
     float press = 0.82 + 0.18 * grain(vUv * vec2(90.0, 18.0) + uSeed);
     float fade = uFadeFrom < 1.0 ? 1.0 - smoothstep(uFadeFrom, 1.0, vUv.x) : 1.0;
     gl_FragColor = vec4(uColor, uOpacity * press * fade);
+    #include <colorspace_fragment>
   }
 `;

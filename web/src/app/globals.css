@@ -58,7 +58,7 @@ a:hover { color: var(--carbon); }
 :focus-visible { outline: 2px solid var(--carbon); outline-offset: 2px; }
 
 h1, h2, h3 { font-weight: 700; margin: 0; }
-h1 { font-size: clamp(56px, 11vw, 148px); line-height: 0.9; font-stretch: 125%; font-weight: 800; letter-spacing: -0.02em; }
+h1 { font-size: clamp(44px, 11vw, 148px); line-height: 0.9; font-stretch: 125%; font-weight: 800; letter-spacing: -0.02em; }
 h2 { font-size: 34px; line-height: 42px; font-stretch: 112%; letter-spacing: -0.01em; }
 h3 { font-size: 19px; line-height: var(--rule-gap); font-stretch: 100%; }
 p { margin: 0 0 var(--rule-gap); max-width: var(--measure); }
@@ -114,6 +114,8 @@ input, select { font: inherit; color: inherit; background: transparent; border: 
   :root { --gutter: 40px; font-size: 16px; }
   .section > .step { font-size: 28px; }
   h2 { font-size: 26px; line-height: var(--rule-gap); }
+  h1 { font-size: 15vw; font-stretch: 100%; }
+  .stack-label.odd { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {

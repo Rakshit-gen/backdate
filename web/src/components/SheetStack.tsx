@@ -158,9 +158,9 @@ function Rig({ versions, labels, onProject }: { versions: number; labels: LabelS
   useEffect(() => {
     const cam = camera as THREE.OrthographicCamera;
     const height = yOf(versions) + 1.6;
-    cam.zoom = Math.min(size.width / (W * 1.12), size.height / (height + D * 0.75));
+    cam.zoom = Math.min(size.width / (W * (size.width < 600 ? 1.4 : 1.12)), size.height / (height + D * 0.75));
     cam.position.set(4.2, 7 + height / 2, 10);
-    cam.lookAt(0, height / 2 - 0.4, 0);
+    cam.lookAt(0, height / 2 - 1.1, 0.4);
     cam.updateProjectionMatrix();
     cam.updateMatrixWorld();
     onProject(
@@ -206,7 +206,7 @@ export function SheetStack({ lanes, versions, selected }: { lanes: Lane[]; versi
         ))}
       </Canvas>
       {projected.map((l) => (
-        <span key={l.id} className={`stack-label ${l.kind}`} style={{ left: l.x, top: l.y }}>
+        <span key={l.id} className={`stack-label ${l.kind}${l.id.match(/^m\d*[13579]$/) ? " odd" : ""}`} style={{ left: l.x, top: l.y }}>
           {l.text}
         </span>
       ))}
