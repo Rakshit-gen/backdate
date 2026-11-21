@@ -55,6 +55,9 @@ export function Payroll() {
   const totalDelta = rows.reduce((s, r) => s + r.after.gross_cents - (r.backend ?? r.sim.gross_cents), 0);
   const whDelta = rows.reduce((s, r) => s + r.whAfter - (r.whNow ?? 0), 0);
   const writesOff = source.kind !== "live";
+  // Outstanding work is counted across the tenant, so cap it at what this write caused.
+  const outstanding = scene.clock.computations.stale + scene.clock.computations.pending;
+  const left = result && !result.noop ? Math.min(outstanding, result.invalidated) : 0;
   const noChange = newCents === currentSalary && salaryNow.at(-1)?.start === from;
 
   async function submit(e: React.FormEvent) {
@@ -124,8 +127,21 @@ export function Payroll() {
             ) : (
               <>
                 Posted as version {result.version}. The backend marked {result.invalidated} results stale in the same
-                transaction. <Link href="/workers">Watch the workers recompute them</Link> or{" "}
-                <Link href="/invalidation">see which ones and why</Link>.
+                transaction.{" "}
+                {left > 0 ? (
+                  <>
+                    Workers are recomputing them: {result.invalidated - left} of {result.invalidated} done.
+                  </>
+                ) : (
+                  <>All {result.invalidated} are recomputed and the table below shows the new figures.</>
+                )}
+                <span className="progress" aria-hidden="true">
+                  <span
+                    style={{ width: `${(100 * (result.invalidated - left)) / Math.max(1, result.invalidated)}%` }}
+                  />
+                </span>
+                <Link href="/invalidation">See which ones and why</Link>, or{" "}
+                <Link href="/feed">read the corrections they published</Link>.
               </>
             )}
           </p>
