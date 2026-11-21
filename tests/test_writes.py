@@ -103,9 +103,12 @@ def test_exclusion_constraint_blocks_overlapping_current_rows(tenant):
 def test_tenants_do_not_see_each_other(tenant, other_tenant):
     salary(tenant, D(2024, 1, 1), None, 100)
     assert reads.value_at(other_tenant.id, "employee:1", "salary", D(2024, 2, 1)) is None
-    assert writes.apply(
-        other_tenant.id, [Assert("employee:1", "salary", Span(D(2024, 1, 1)), 5)]
-    ).version == 1
+    assert (
+        writes.apply(
+            other_tenant.id, [Assert("employee:1", "salary", Span(D(2024, 1, 1)), 5)]
+        ).version
+        == 1
+    )
 
 
 def test_rejects_empty_write(tenant):
