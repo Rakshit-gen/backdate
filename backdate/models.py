@@ -188,10 +188,11 @@ class Computation(models.Model):
                 condition=Q(status__in=["pending", "stale"]),
                 name="computation_runnable_idx",
             ),
+            # Serves the per-tenant probe in the fair claim and the backlog check.
             models.Index(
-                fields=["tenant"],
+                fields=["tenant", "not_before", "id"],
                 condition=Q(status__in=["pending", "stale"]),
-                name="computation_backlog_idx",
+                name="computation_tenant_queue_idx",
             ),
         ]
 
