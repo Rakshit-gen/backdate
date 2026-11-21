@@ -4,61 +4,36 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useHydrated } from "@/lib/tokens";
 import { fmtDate } from "@/lib/format";
-import { assertFrom, cents, gross, type Piece, withholding } from "@/lib/payroll";
-import { byDerivation, knownAt, MONTHS } from "@/lib/scene";
+import { cents } from "@/lib/payroll";
+import { pieces, simulate } from "@/lib/simulate";
+import { MONTHS } from "@/lib/scene";
 import { signed } from "@/lib/story";
-import type { HistoryRow, WriteResult } from "@/lib/types";
+import type { WriteResult } from "@/lib/types";
 import { PageHead } from "./PageHead";
 import { useScene } from "./SceneProvider";
 
-const pieces = (rows: HistoryRow[], v: number): Piece<number>[] =>
-  knownAt(rows, v).map((r) => ({ start: r.from, end: r.to, value: r.value as number }));
-
-const num = (r: Record<string, unknown> | null | undefined, k: string) =>
-  typeof r?.[k] === "number" ? (r[k] as number) : null;
-
-export function Payroll() {
+export function Payroll({ initialMonth = 3, initialSalary }: { initialMonth?: number; initialSalary?: number }) {
   const { scene, live, post, source } = useScene();
-  const v = scene.clock.version;
-  const salaryNow = useMemo(() => pieces(scene.salary.rows, v), [scene.salary, v]);
-  const fteNow = useMemo(() => pieces(scene.fte.rows, v), [scene.fte, v]);
-  const currentSalary = salaryNow.at(-1)?.value ?? 0;
-
-  const [month, setMonth] = useState(3);
-  const [amount, setAmount] = useState(Math.round(currentSalary / 100) + 5000);
+  const [month, setMonth] = useState(initialMonth);
+  const [amount, setAmount] = useState(
+    initialSalary ?? Math.round(((pieces(scene.salary.rows, scene.clock.version).at(-1)?.value ?? 0) + 500_000) / 100),
+  );
   const [posting, setPosting] = useState(false);
   const [result, setResult] = useState<WriteResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   // Until hydration the button would submit the form natively and reload the page.
   const ready = useHydrated();
 
-  const from = `2024-${String(month).padStart(2, "0")}-01`;
   const newCents = Math.round(amount * 100);
-  const salaryAfter = useMemo(() => assertFrom(salaryNow, from, newCents), [salaryNow, from, newCents]);
-
-  const grossRes = byDerivation(scene.computations, "payroll.gross");
-  const whRes = byDerivation(scene.computations, "payroll.withholding");
-
-  const rows = MONTHS.map((name, i) => {
-    const sim = gross(salaryNow, fteNow, 2024, i + 1);
-    const after = gross(salaryAfter, fteNow, 2024, i + 1);
-    const backend = num(grossRes[i]?.result, "gross_cents");
-    const rate = num(whRes[i]?.result, "rate_bp") ?? 0;
-    const whNow = num(whRes[i]?.result, "withholding_cents");
-    const whAfter = withholding(after.gross_cents, rate);
-    return { name, i, sim, after, backend, whNow, whAfter, stale: grossRes[i]?.status !== "fresh" };
-  });
-
-  const checked = rows.filter((r) => r.backend !== null && !r.stale);
-  const matches = checked.filter((r) => r.backend === r.sim.gross_cents).length;
-  const changed = rows.filter((r) => r.after.gross_cents !== (r.backend ?? r.sim.gross_cents));
-  const totalDelta = rows.reduce((s, r) => s + r.after.gross_cents - (r.backend ?? r.sim.gross_cents), 0);
-  const whDelta = rows.reduce((s, r) => s + r.whAfter - (r.whNow ?? 0), 0);
+  const sim = useMemo(() => simulate(scene, month, newCents), [scene, month, newCents]);
+  const { from, rows, checked, matches, grossDelta: totalDelta, whDelta } = sim;
+  const currentSalary = sim.current?.value ?? 0;
+  const changed = rows.filter((r) => r.after.gross_cents !== r.now);
   const writesOff = source.kind !== "live";
   // Outstanding work is counted across the tenant, so cap it at what this write caused.
   const outstanding = scene.clock.computations.stale + scene.clock.computations.pending;
   const left = result && !result.noop ? Math.min(outstanding, result.invalidated) : 0;
-  const noChange = newCents === currentSalary && salaryNow.at(-1)?.start === from;
+  const noChange = sim.noop;
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -115,7 +90,7 @@ export function Payroll() {
           </div>
         </div>
         <p className="muted">
-          Currently {cents(currentSalary)} a year from {fmtDate(salaryNow.at(-1)?.start ?? null)}.{" "}
+          Currently {cents(currentSalary)} a year from {fmtDate(sim.current?.start ?? null)}.{" "}
           {writesOff
             ? "Posting needs the live backend; the table below still works."
             : "Posting writes one assert op through the page's proxy, which allows only this kind of write."}
@@ -156,11 +131,11 @@ export function Payroll() {
       <section className="block">
         <h2>Month by month</h2>
         <p className="muted">
-          {checked.length > 0 && (
+          {checked > 0 && (
             <>
               Check: the browser&rsquo;s arithmetic gives the backend&rsquo;s exact current gross for{" "}
-              <strong className={matches === checked.length ? undefined : "red"}>
-                {matches} of {checked.length}
+              <strong className={matches === checked ? undefined : "red"}>
+                {matches} of {checked}
               </strong>{" "}
               months.{" "}
             </>
@@ -184,7 +159,7 @@ export function Payroll() {
             </thead>
             <tbody>
               {rows.map((r) => {
-                const now = r.backend ?? r.sim.gross_cents;
+                const now = r.now;
                 const d = r.after.gross_cents - now;
                 const wd = r.whAfter - (r.whNow ?? 0);
                 return (
