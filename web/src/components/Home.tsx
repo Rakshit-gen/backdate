@@ -45,13 +45,15 @@ export function Home() {
           Hatched means a later write replaced it. Drag down the chart, or use the slider, to read the facts as they
           stood at any version.
         </p>
-        <Bitemporal
-          attribute="annual_salary_cents"
-          rows={scene.salary.rows}
-          versions={versions}
-          selected={selected}
-          onSelect={setSelected}
-        />
+        <div className="wide">
+          <Bitemporal
+            attribute="annual_salary_cents"
+            rows={scene.salary.rows}
+            versions={versions}
+            selected={selected}
+            onSelect={setSelected}
+          />
+        </div>
         <label className="scrub">
           <span>
             Reading at version <strong>{selected}</strong> of {versions}
@@ -75,40 +77,42 @@ export function Home() {
                 : `(this write changed nothing for employee ${scene.employee})`}
             </span>
           </h3>
-          <table>
-            <thead>
-              <tr>
-                <th>Fact</th>
-                <th>True from</th>
-                <th>Until</th>
-                <th className="num">Value</th>
-                <th className="num">Written at</th>
-              </tr>
-            </thead>
-            <tbody>
-              {lanes.flatMap(({ attribute, rows }) =>
-                knownAt(rows, selected).map((r) => (
-                  <tr
-                    key={`${attribute}${r.tx_from}${r.from}`}
-                    className={isCorrection(rows, r, selected) ? "red" : undefined}
-                  >
-                    <td>{NAMES[attribute]}</td>
-                    <td>{fmtDate(r.from)}</td>
-                    <td>{r.to ? fmtDate(r.to) : "open"}</td>
-                    <td className="num">{fmtValue(attribute, r.value)}</td>
-                    <td className="num">v{r.tx_from}</td>
-                  </tr>
-                )),
-              )}
-              {knownAt(scene.salary.rows, selected).length === 0 && (
+          <div className="table-wrap">
+            <table>
+              <thead>
                 <tr>
-                  <td colSpan={5} className="muted">
-                    Nothing yet. Employee {scene.employee} is hired at a later version.
-                  </td>
+                  <th>Fact</th>
+                  <th>True from</th>
+                  <th>Until</th>
+                  <th className="num">Value</th>
+                  <th className="num">Written at</th>
                 </tr>
-              )}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {lanes.flatMap(({ attribute, rows }) =>
+                  knownAt(rows, selected).map((r) => (
+                    <tr
+                      key={`${attribute}${r.tx_from}${r.from}`}
+                      className={isCorrection(rows, r, selected) ? "red" : undefined}
+                    >
+                      <td>{NAMES[attribute]}</td>
+                      <td>{fmtDate(r.from)}</td>
+                      <td>{r.to ? fmtDate(r.to) : "open"}</td>
+                      <td className="num">{fmtValue(attribute, r.value)}</td>
+                      <td className="num">v{r.tx_from}</td>
+                    </tr>
+                  )),
+                )}
+                {knownAt(scene.salary.rows, selected).length === 0 && (
+                  <tr>
+                    <td colSpan={5} className="muted">
+                      Nothing yet. Employee {scene.employee} is hired at a later version.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </section>
 

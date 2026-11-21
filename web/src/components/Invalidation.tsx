@@ -78,7 +78,9 @@ export function Invalidation() {
                 Replay
               </button>
             </div>
-            <Loom graph={scene.graph} change={change} picked={picked} onPick={setPicked} replay={replay} />
+            <div className="wide">
+              <Loom graph={scene.graph} change={change} picked={picked} onPick={setPicked} replay={replay} />
+            </div>
             <p className="muted small">
               Top: the facts, January to December, with the changed range in red. Lines are recorded reads: a gross
               result reads its month of salary and FTE, a withholding result reads the state and its tax rate on the

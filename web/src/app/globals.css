@@ -357,7 +357,7 @@ td s {
   width: 100%;
   height: auto;
   margin-top: 20px;
-  touch-action: none;
+  touch-action: pan-x;
   cursor: ns-resize;
   user-select: none;
 }
@@ -774,4 +774,13 @@ p.figure .muted {
   font-weight: 400;
   font-stretch: 100%;
   margin-top: 8px;
+}
+
+/* Charts keep a readable size on phones and scroll sideways instead of shrinking. */
+.wide {
+  overflow-x: auto;
+}
+.wide > .bitemporal,
+.wide > .loom {
+  min-width: 720px;
 }

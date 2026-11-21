@@ -91,7 +91,6 @@ export function Feed() {
                 <h2>
                   Version {v}
                   <span className="muted">
-                    {" "}
                     {reasons.get(v) ? `, ${reasons.get(v)}` : ""}
                     {lines[0] ? `, published ${fmtTime(lines[0].r.created_at)}` : ""}
                   </span>

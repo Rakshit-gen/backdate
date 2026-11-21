@@ -228,7 +228,7 @@ export function Loom({ graph, change, picked, onPick, replay }: Props) {
       </Canvas>
       {lay.lanes.map((l) => (
         <span key={`${l.entity}${l.attribute}`} className="loom-label lane" style={pct(LEFT - 14, l.y)}>
-          {ATTRIBUTE_NAMES[l.attribute] ?? l.attribute}
+          {l.entity.startsWith("taxrate:") ? "Tax rate" : (ATTRIBUTE_NAMES[l.attribute] ?? l.attribute)}
           {l.entity.startsWith("taxrate:") ? ` (${l.entity.slice(8)})` : ""}
         </span>
       ))}
