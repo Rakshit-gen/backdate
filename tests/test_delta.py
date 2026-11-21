@@ -29,7 +29,7 @@ def test_scalars():
     assert delta(7, 10) == 3
 
 
-@given(st.lists(st.dictionaries(st.sampled_from("abc"), st.integers(-10**9, 10**9)), min_size=1))
+@given(st.lists(st.dictionaries(st.sampled_from("abc"), st.integers(-(10**9), 10**9)), min_size=1))
 def test_deltas_sum_to_last_value(history):
     totals: dict[str, int] = {}
     previous = None
@@ -37,4 +37,6 @@ def test_deltas_sum_to_last_value(history):
         for k, v in delta(previous, current).items():
             totals[k] = totals.get(k, 0) + v
         previous = current
-    assert {k: v for k, v in totals.items() if v or k in history[-1]} == history[-1]
+    last = history[-1]
+    for k in set(totals) | set(last):
+        assert totals.get(k, 0) == last.get(k, 0), k
