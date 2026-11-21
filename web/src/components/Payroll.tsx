@@ -109,7 +109,7 @@ export function Payroll() {
           </div>
         </div>
         <p className="muted">
-          Currently {cents(currentSalary)} a year from {salaryNow.at(-1)?.start ?? "–"}.{" "}
+          Currently {cents(currentSalary)} a year from {fmtDate(salaryNow.at(-1)?.start ?? null)}.{" "}
           {writesOff
             ? "Posting needs the live backend; the table below still works."
             : "Posting writes one assert op through the page's proxy, which allows only this kind of write."}
