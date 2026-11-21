@@ -60,6 +60,24 @@ curl -s -X POST localhost:8000/v1/writes -H "Authorization: Bearer $TOKEN" \
 
 There is also a `compose.yaml` with Postgres, the API and two workers. I have not run it myself (there is no Docker on my machine), but CI builds the image.
 
+## The demo site
+
+`web/` is a Next.js site that walks through one backdated raise against a running backend:
+
+- **Home**: the salary as the database knew it at each version.
+- **Payroll**: simulate a raise month by month, then post it for real.
+- **Invalidation**: which results went stale and why, drawn from the stored read sets.
+- **Workers**: recompute with lease tokens, plus a step-through of the fencing test.
+- **Feed**: the corrections, with their differences summed and checked against the stored results.
+- **Benchmarks**: the numbers below.
+
+```bash
+./web/scripts/backend.sh --fresh   # fresh demo database, API on :8000, one worker
+cd web && pnpm install && pnpm dev # http://localhost:3100
+```
+
+The browser never sees the API token. Pages go through a small proxy that only allows reads and one kind of salary write. Without a backend the site shows a recording of a real run (`pnpm snapshot` makes a new one) and says so at the top of every page. `pnpm test` runs the unit tests. `pnpm build && pnpm e2e` runs Playwright against the built site in recording mode. Design notes are in [web/DESIGN.md](web/DESIGN.md).
+
 ## Writing a derivation
 
 ```python
