@@ -1,6 +1,6 @@
 // Shapes returned by the backdate API (backdate/api/views.py).
 
-export type Span = { start: string; end: string | null };
+export type Span = { from: string; to: string | null };
 
 export type HistoryRow = Span & { value: unknown; tx_from: number; tx_to: number | null };
 export type History = { entity: string; attribute: string; rows: HistoryRow[] };
