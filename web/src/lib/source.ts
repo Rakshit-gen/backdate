@@ -29,9 +29,7 @@ async function allRestatements(prefix: string): Promise<Restatement[]> {
   const out: Restatement[] = [];
   let cursor = "0.0";
   for (let page = 0; page < 50; page++) {
-    const r = await api<{ restatements: Restatement[]; cursor: string }>(
-      `restatements?limit=1000&cursor=${cursor}`,
-    );
+    const r = await api<{ restatements: Restatement[]; cursor: string }>(`restatements?limit=1000&cursor=${cursor}`);
     out.push(...r.restatements.filter((x) => x.computation.key.startsWith(prefix)));
     if (r.restatements.length < 1000) break;
     cursor = r.cursor;

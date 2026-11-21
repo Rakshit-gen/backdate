@@ -17,7 +17,10 @@ function Bars({ rows, caption }: { rows: Row[]; caption: string }) {
           <tr key={r.label}>
             <th scope="row">{r.label}</th>
             <td>
-              <span className={`bar${r.accent ? " accent" : ""}`} style={{ width: `${Math.max(0.4, (r.value / max) * 100)}%` }} />
+              <span
+                className={`bar${r.accent ? " accent" : ""}`}
+                style={{ width: `${Math.max(0.4, (r.value / max) * 100)}%` }}
+              />
             </td>
             <td className="num">{r.shown}</td>
           </tr>
@@ -32,9 +35,8 @@ export default function Page() {
     <div className="page">
       <PageHead title="Benchmarks">
         <p>
-          From <code>bench/run.py</code> on one Apple Silicon Mac with Postgres 18 on the same machine:
-          200 employees, 12 months, 4,800 results. Compare the rows with each other, not with
-          production numbers from elsewhere.
+          From <code>bench/run.py</code> on one Apple Silicon Mac with Postgres 18 on the same machine: 200 employees,
+          12 months, 4,800 results. Compare the rows with each other, not with production numbers from elsewhere.
         </p>
       </PageHead>
 
@@ -42,9 +44,8 @@ export default function Page() {
         <div>
           <h2>Recompute only what read the change</h2>
           <p className="muted">
-            One raise effective 1 July for one employee, then wait until every result is fresh again,
-            with 4 worker processes. Naive marks everything stale, which is what you do without
-            read sets.
+            One raise effective 1 July for one employee, then wait until every result is fresh again, with 4 worker
+            processes. Naive marks everything stale, which is what you do without read sets.
           </p>
         </div>
         <div>
@@ -63,8 +64,8 @@ export default function Page() {
             ]}
           />
           <p className="muted small">
-            The 12 are July to December, gross and withholding. About 0.39 s of the 0.67 s is starting
-            the worker processes, not computing.
+            The 12 are July to December, gross and withholding. About 0.39 s of the 0.67 s is starting the worker
+            processes, not computing.
           </p>
         </div>
       </section>
@@ -73,9 +74,8 @@ export default function Page() {
         <div>
           <h2>Backdated write latency</h2>
           <p className="muted">
-            300 single-op raises against a fully computed tenant. Each one takes the clock lock,
-            diffs, writes fact rows and change ranges, and runs the invalidation join. On average a
-            write marked 10.5 results stale.
+            300 single-op raises against a fully computed tenant. Each one takes the clock lock, diffs, writes fact rows
+            and change ranges, and runs the invalidation join. On average a write marked 10.5 results stale.
           </p>
         </div>
         <div className="table-wrap">
@@ -104,9 +104,8 @@ export default function Page() {
         <div>
           <h2>Recompute throughput</h2>
           <p className="muted">
-            Draining all 4,800 results from empty. 1 to 2 processes is about 2x. 2 to 4 is worse, and
-            I haven&rsquo;t profiled why. The share lock on the single tenant clock during saves is
-            the first suspect.
+            Draining all 4,800 results from empty. 1 to 2 processes is about 2x. 2 to 4 is worse, and I haven&rsquo;t
+            profiled why. The share lock on the single tenant clock during saves is the first suspect.
           </p>
         </div>
         <Bars
@@ -123,9 +122,8 @@ export default function Page() {
         <div>
           <h2>The cost of one clock per tenant</h2>
           <p className="muted">
-            8 threads, 50 writes each. In one tenant every write queues on the same clock row. Spread
-            over 8 tenants they don&rsquo;t. It isn&rsquo;t 8x because the threads share one Python
-            process and one machine.
+            8 threads, 50 writes each. In one tenant every write queues on the same clock row. Spread over 8 tenants
+            they don&rsquo;t. It isn&rsquo;t 8x because the threads share one Python process and one machine.
           </p>
         </div>
         <div>
@@ -144,8 +142,8 @@ export default function Page() {
         <div>
           <h2>Recovering from a killed worker</h2>
           <p className="muted">
-            <code>SIGKILL</code> a worker mid-compute with a 3 second lease, then time until another
-            worker has redone its job.
+            <code>SIGKILL</code> a worker mid-compute with a 3 second lease, then time until another worker has redone
+            its job.
           </p>
         </div>
         <p className="figure">
@@ -155,9 +153,8 @@ export default function Page() {
 
       <section className="block">
         <p className="muted">
-          Not measured yet: more than one machine, a network between app and database, pgbouncer,
-          long histories, and latency through gunicorn. The full tables and caveats are in{" "}
-          <code>docs/benchmarks.md</code>.
+          Not measured yet: more than one machine, a network between app and database, pgbouncer, long histories, and
+          latency through gunicorn. The full tables and caveats are in <code>docs/benchmarks.md</code>.
         </p>
       </section>
     </div>

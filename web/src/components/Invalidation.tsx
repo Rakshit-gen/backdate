@@ -11,7 +11,9 @@ import { useScene } from "./SceneProvider";
 
 const short = (d: string) => (d === "payroll.gross" ? "Gross" : d === "payroll.withholding" ? "Withholding" : d);
 const span = (from: string, to: string | null) =>
-  to && new Date(Date.parse(to) - 86_400_000).toISOString().slice(0, 10) === from ? fmtDate(from) : `${fmtDate(from)} to ${to ? fmtDate(to) : "open"}`;
+  to && new Date(Date.parse(to) - 86_400_000).toISOString().slice(0, 10) === from
+    ? fmtDate(from)
+    : `${fmtDate(from)} to ${to ? fmtDate(to) : "open"}`;
 
 export function Invalidation() {
   const { scene, lastWrite } = useScene();
@@ -25,7 +27,10 @@ export function Invalidation() {
   useEffect(() => setVersion(latest), [latest]);
 
   const change = corrections.find((c) => c.version === version);
-  const depth = useMemo(() => (change ? affectedBy(change, scene.graph) : new Map<number, number>()), [change, scene.graph]);
+  const depth = useMemo(
+    () => (change ? affectedBy(change, scene.graph) : new Map<number, number>()),
+    [change, scene.graph],
+  );
   const stale = scene.graph.computations
     .filter((c) => depth.has(c.id))
     .sort((a, b) => monthOf(a.key) - monthOf(b.key) || a.derivation.localeCompare(b.derivation));
@@ -36,9 +41,9 @@ export function Invalidation() {
     <div className="page">
       <PageHead title="Invalidation">
         <p>
-          Every result remembers which date ranges of which facts it read. A write that changes a
-          range marks exactly the results that read it as stale, plus whatever read those, in the
-          same transaction. Here is that join, drawn from the read sets the backend stored.
+          Every result remembers which date ranges of which facts it read. A write that changes a range marks exactly
+          the results that read it as stale, plus whatever read those, in the same transaction. Here is that join, drawn
+          from the read sets the backend stored.
         </p>
       </PageHead>
 
@@ -62,7 +67,10 @@ export function Invalidation() {
                     aria-pressed={c.version === version}
                     onClick={() => setVersion(c.version)}
                   >
-                    v{c.version}: {c.changes.map((x) => `${ATTRIBUTE_NAMES[x.attribute] ?? x.attribute} from ${fmtDate(x.from)}`).join(", ")}
+                    v{c.version}:{" "}
+                    {c.changes
+                      .map((x) => `${ATTRIBUTE_NAMES[x.attribute] ?? x.attribute} from ${fmtDate(x.from)}`)
+                      .join(", ")}
                   </button>
                 ))}
               </div>
@@ -72,10 +80,10 @@ export function Invalidation() {
             </div>
             <Loom graph={scene.graph} change={change} picked={picked} onPick={setPicked} replay={replay} />
             <p className="muted small">
-              Top: the facts, January to December, with the changed range in red. Lines are recorded
-              reads: a gross result reads its month of salary and FTE, a withholding result reads
-              the state and its tax rate on the month&rsquo;s last day, plus that month&rsquo;s gross.
-              Click a result to see its read set. Drawn from today&rsquo;s read sets.
+              Top: the facts, January to December, with the changed range in red. Lines are recorded reads: a gross
+              result reads its month of salary and FTE, a withholding result reads the state and its tax rate on the
+              month&rsquo;s last day, plus that month&rsquo;s gross. Click a result to see its read set. Drawn from
+              today&rsquo;s read sets.
             </p>
           </section>
 
@@ -85,7 +93,11 @@ export function Invalidation() {
                 {stale.length} of {scene.graph.computations.length} results marked stale
               </h2>
               <p className="muted">
-                {change && <>Version {change.version}, written at {fmtTime(change.recorded_at)}. </>}
+                {change && (
+                  <>
+                    Version {change.version}, written at {fmtTime(change.recorded_at)}.{" "}
+                  </>
+                )}
                 {reported !== null && (
                   <>
                     The backend&rsquo;s own count for this write was <strong>{reported}</strong>

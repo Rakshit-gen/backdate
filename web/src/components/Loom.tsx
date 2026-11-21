@@ -4,7 +4,20 @@ import { Canvas, useThree } from "@react-three/fiber";
 import gsap from "gsap";
 import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
-import { edgeBuffers, type EdgeSpec, GROSS_Y, H, LEFT, layout, monthX, NODE_R, nodeStart, RIGHT, W, WH_Y } from "@/lib/loom";
+import {
+  edgeBuffers,
+  type EdgeSpec,
+  GROSS_Y,
+  H,
+  LEFT,
+  layout,
+  monthX,
+  NODE_R,
+  nodeStart,
+  RIGHT,
+  W,
+  WH_Y,
+} from "@/lib/loom";
 import { MONTHS } from "@/lib/scene";
 import { lineFrag, lineVert, nodeFrag, nodeVert } from "@/lib/shaders";
 import { type Tokens, useReducedMotion, useTokens } from "@/lib/tokens";
@@ -45,7 +58,12 @@ function nodeGeometry(lay: Layout, picked: number | null) {
   const pick: number[] = [];
   const index: number[] = [];
   lay.nodes.forEach((n, i) => {
-    for (const [dx, dy] of [[-s, -s], [s, -s], [s, s], [-s, s]] as const) {
+    for (const [dx, dy] of [
+      [-s, -s],
+      [s, -s],
+      [s, s],
+      [-s, s],
+    ] as const) {
       pos.push(n.x + dx, n.y + dy, 1);
       local.push(dx, dy);
       start.push(n.depth === null ? -1 : nodeStart(n.depth));
@@ -63,13 +81,33 @@ function nodeGeometry(lay: Layout, picked: number | null) {
   return g;
 }
 
-function Ink({ lay, tokens, picked, clock }: { lay: Layout; tokens: Tokens; picked: number | null; clock: { t: number } }) {
+function Ink({
+  lay,
+  tokens,
+  picked,
+  clock,
+}: {
+  lay: Layout;
+  tokens: Tokens;
+  picked: number | null;
+  clock: { t: number };
+}) {
   const invalidate = useThree((s) => s.invalidate);
 
   const lanes = useMemo(() => {
-    const base: EdgeSpec[] = lay.lanes.map((l) => ({ points: [[LEFT, l.y], [RIGHT, l.y]], start: -1, width: 1.5 }));
+    const base: EdgeSpec[] = lay.lanes.map((l) => ({
+      points: [
+        [LEFT, l.y],
+        [RIGHT, l.y],
+      ],
+      start: -1,
+      width: 1.5,
+    }));
     const changed: EdgeSpec[] = lay.changed.map((c) => ({
-      points: [[c.x0, c.lane.y], [c.x1, c.lane.y]],
+      points: [
+        [c.x0, c.lane.y],
+        [c.x1, c.lane.y],
+      ],
       start: 0,
       width: 7,
       dur: 0.3,
@@ -87,7 +125,11 @@ function Ink({ lay, tokens, picked, clock }: { lay: Layout; tokens: Tokens; pick
         transparent: true,
         depthTest: false,
         side: THREE.DoubleSide,
-        uniforms: { uTime: { value: 0 }, uBase: { value: new THREE.Color(base) }, uInk: { value: new THREE.Color() } },
+        uniforms: {
+          uTime: { value: 0 },
+          uBase: { value: new THREE.Color(base) },
+          uInk: { value: new THREE.Color() },
+        },
       });
     const node = new THREE.ShaderMaterial({
       vertexShader: nodeVert,
@@ -190,8 +232,12 @@ export function Loom({ graph, change, picked, onPick, replay }: Props) {
           {l.entity.startsWith("taxrate:") ? ` (${l.entity.slice(8)})` : ""}
         </span>
       ))}
-      <span className="loom-label row" style={pct(LEFT - 14, GROSS_Y)}>Gross</span>
-      <span className="loom-label row" style={pct(LEFT - 14, WH_Y)}>Withholding</span>
+      <span className="loom-label row" style={pct(LEFT - 14, GROSS_Y)}>
+        Gross
+      </span>
+      <span className="loom-label row" style={pct(LEFT - 14, WH_Y)}>
+        Withholding
+      </span>
       {MONTHS.map((m, i) => (
         <span key={m} className="loom-label month" style={pct(monthX(i), WH_Y + 34)}>
           {m}

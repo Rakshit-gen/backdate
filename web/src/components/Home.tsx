@@ -32,18 +32,18 @@ export function Home() {
       <div className="home-title">
         <h1 className="display">backdate</h1>
         <p className="lede">
-          Bitemporal facts for Django on Postgres. Correct a salary back in March, and only the pay
-          results that read March onwards are recomputed, under leases, with every change published
-          as a correction you can post to a ledger.
+          Bitemporal facts for Django on Postgres. Correct a salary back in March, and only the pay results that read
+          March onwards are recomputed, under leases, with every change published as a correction you can post to a
+          ledger.
         </p>
       </div>
 
       <section className="block">
         <h2>Employee {scene.employee}&rsquo;s salary, as the database knew it</h2>
         <p className="muted">
-          Across: the dates a salary applies to. Down: each write, in order. A box is one stored row,
-          kept forever. Hatched means a later write replaced it. Drag down the chart, or use the
-          slider, to read the facts as they stood at any version.
+          Across: the dates a salary applies to. Down: each write, in order. A box is one stored row, kept forever.
+          Hatched means a later write replaced it. Drag down the chart, or use the slider, to read the facts as they
+          stood at any version.
         </p>
         <Bitemporal
           attribute="annual_salary_cents"
@@ -88,7 +88,10 @@ export function Home() {
             <tbody>
               {lanes.flatMap(({ attribute, rows }) =>
                 knownAt(rows, selected).map((r) => (
-                  <tr key={`${attribute}${r.tx_from}${r.from}`} className={isCorrection(rows, r, selected) ? "red" : undefined}>
+                  <tr
+                    key={`${attribute}${r.tx_from}${r.from}`}
+                    className={isCorrection(rows, r, selected) ? "red" : undefined}
+                  >
                     <td>{NAMES[attribute]}</td>
                     <td>{fmtDate(r.from)}</td>
                     <td>{r.to ? fmtDate(r.to) : "open"}</td>
@@ -118,7 +121,10 @@ export function Home() {
                 <span className="step-n">1</span>
                 <span className="step-t">Written</span>
                 <span className="step-d">
-                  Version {s.change.version}: {s.change.changes.map((c) => `${NAMES[c.attribute] ?? c.attribute} from ${fmtDate(c.from)}`).join(", ")}
+                  Version {s.change.version}:{" "}
+                  {s.change.changes
+                    .map((c) => `${NAMES[c.attribute] ?? c.attribute} from ${fmtDate(c.from)}`)
+                    .join(", ")}
                 </span>
               </Link>
             </li>
@@ -145,14 +151,16 @@ export function Home() {
                 <span className="step-n">4</span>
                 <span className="step-t">Published</span>
                 <span className="step-d">
-                  {s.restated.length} corrections in the feed: gross {signed(s.grossDelta)}, withholding {signed(s.withholdingDelta)}
+                  {s.restated.length} corrections in the feed: gross {signed(s.grossDelta)}, withholding{" "}
+                  {signed(s.withholdingDelta)}
                 </span>
               </Link>
             </li>
           </ol>
         ) : (
           <p>
-            No correction yet, only the first entry. <Link href="/payroll">Backdate a raise</Link> to see one go through.
+            No correction yet, only the first entry. <Link href="/payroll">Backdate a raise</Link> to see one go
+            through.
           </p>
         )}
       </section>

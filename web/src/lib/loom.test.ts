@@ -39,7 +39,17 @@ describe("layout", () => {
 });
 
 it("builds two vertices per point and two triangles per segment", () => {
-  const b = edgeBuffers([{ points: [[0, 0], [10, 0], [20, 0]], start: 0, width: 2 }]);
+  const b = edgeBuffers([
+    {
+      points: [
+        [0, 0],
+        [10, 0],
+        [20, 0],
+      ],
+      start: 0,
+      width: 2,
+    },
+  ]);
   expect(b.position.length).toBe(3 * 2 * 3);
   expect(b.index.length).toBe(2 * 6);
   expect([...b.along]).toEqual([0, 0, 0.5, 0.5, 1, 1]);

@@ -30,7 +30,9 @@ function Cell({ c, field }: { c: Computation | undefined; field: string }) {
     <td className={`job ${c.status}`}>
       <motion.div
         key={`${c.status}-${c.result_seq}`}
-        initial={reduced || !seen.current ? false : { backgroundColor: busy ? "var(--flash-red)" : "var(--flash-blue)" }}
+        initial={
+          reduced || !seen.current ? false : { backgroundColor: busy ? "var(--flash-red)" : "var(--flash-blue)" }
+        }
         animate={{ backgroundColor: "rgba(0,0,0,0)" }}
         transition={{ duration: 0.9 }}
         className="job-in"
@@ -97,17 +99,22 @@ export function Workers() {
     <div className="page">
       <PageHead title="Workers">
         <p>
-          Workers claim stale results with <code>FOR UPDATE SKIP LOCKED</code>, recompute them and
-          save them. Each claim is a lease with a fencing token, so a worker that stalls past its
-          lease can never overwrite the one that took over.
+          Workers claim stale results with <code>FOR UPDATE SKIP LOCKED</code>, recompute them and save them. Each claim
+          is a lease with a fencing token, so a worker that stalls past its lease can never overwrite the one that took
+          over.
         </p>
       </PageHead>
 
       <section className="block">
         <h2>Employee {scene.employee}&rsquo;s results</h2>
         <p className="muted">
-          {live ? (busy ? "Watching the backend while the workers catch up." : "Live from the backend.") : "From the recording."}{" "}
-          Across the tenant: {counts.fresh} fresh, {counts.stale} stale, {counts.pending} pending, {counts.failed} failed.{" "}
+          {live
+            ? busy
+              ? "Watching the backend while the workers catch up."
+              : "Live from the backend."
+            : "From the recording."}{" "}
+          Across the tenant: {counts.fresh} fresh, {counts.stale} stale, {counts.pending} pending, {counts.failed}{" "}
+          failed.{" "}
           {!busy && (
             <>
               <Link href="/payroll">Post a correction</Link> to watch them recompute.
@@ -137,16 +144,16 @@ export function Workers() {
           </table>
         </div>
         <p className="muted small">
-          Seq counts how many times the stored value actually changed. Token counts claims, so it
-          goes up even when a recompute lands on the same value.
+          Seq counts how many times the stored value actually changed. Token counts claims, so it goes up even when a
+          recompute lands on the same value.
         </p>
       </section>
 
       <section className="block">
         <h2>Fencing, step by step</h2>
         <p className="muted">
-          A replay of <code>tests/test_races.py::test_expired_lease_is_fenced_off</code>, not live
-          data. The test drives two workers by hand so the race happens the same way every run.
+          A replay of <code>tests/test_races.py::test_expired_lease_is_fenced_off</code>, not live data. The test drives
+          two workers by hand so the race happens the same way every run.
         </p>
         <div className="fence">
           <ol className="fence-steps">

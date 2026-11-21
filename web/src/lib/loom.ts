@@ -26,7 +26,9 @@ export const TIMING = { factToNode: 0.25, edge: 0.75, node: 0.35, derived: 0.55 
 
 /** Start time of the ink in an edge into a node at this depth. */
 const edgeStart = (depth: number) =>
-  depth === 0 ? TIMING.factToNode : TIMING.factToNode + TIMING.edge + TIMING.node + (depth - 1) * (TIMING.derived + TIMING.node);
+  depth === 0
+    ? TIMING.factToNode
+    : TIMING.factToNode + TIMING.edge + TIMING.node + (depth - 1) * (TIMING.derived + TIMING.node);
 const edgeDur = (depth: number) => (depth === 0 ? TIMING.edge : TIMING.derived);
 export const nodeStart = (depth: number) => edgeStart(depth) + edgeDur(depth);
 

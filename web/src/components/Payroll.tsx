@@ -74,9 +74,9 @@ export function Payroll() {
     <div className="page">
       <PageHead title="Payroll">
         <p>
-          Give employee {scene.employee} a raise from any month of 2024 and see what it does to each
-          month&rsquo;s pay. The new figures are worked out in your browser with the same arithmetic
-          as the backend. Posting the correction writes it to the backend for real.
+          Give employee {scene.employee} a raise from any month of 2024 and see what it does to each month&rsquo;s pay.
+          The new figures are worked out in your browser with the same arithmetic as the backend. Posting the correction
+          writes it to the backend for real.
         </p>
       </PageHead>
 
@@ -123,9 +123,9 @@ export function Payroll() {
               <>That salary was already true for those dates, so nothing changed and no version was spent.</>
             ) : (
               <>
-                Posted as version {result.version}. The backend marked {result.invalidated} results
-                stale in the same transaction. <Link href="/workers">Watch the workers recompute them</Link>{" "}
-                or <Link href="/invalidation">see which ones and why</Link>.
+                Posted as version {result.version}. The backend marked {result.invalidated} results stale in the same
+                transaction. <Link href="/workers">Watch the workers recompute them</Link> or{" "}
+                <Link href="/invalidation">see which ones and why</Link>.
               </>
             )}
           </p>
@@ -174,7 +174,8 @@ export function Payroll() {
                 return (
                   <tr key={r.name} className={d === 0 && wd === 0 ? "before" : undefined}>
                     <td>
-                      {r.name} 2024{r.stale ? <span className="muted"> (recomputing)</span> : null}
+                      {r.name} 2024
+                      {r.stale ? <span className="muted"> (recomputing)</span> : null}
                     </td>
                     <td className="num">{r.after.days_paid}</td>
                     <td className="num">{cents(now)}</td>
@@ -190,10 +191,9 @@ export function Payroll() {
           </table>
         </div>
         <p className="muted small">
-          &ldquo;Now&rdquo; columns are the backend&rsquo;s stored results. &ldquo;After&rdquo; columns
-          are simulated: pay is salary &times; FTE &divide; 365 for each day employed, summed and rounded
-          once, half to even (<code>examples/payroll/derivations.py</code>). Withholding uses the rate
-          the backend last used for that month.
+          &ldquo;Now&rdquo; columns are the backend&rsquo;s stored results. &ldquo;After&rdquo; columns are simulated:
+          pay is salary &times; FTE &divide; 365 for each day employed, summed and rounded once, half to even (
+          <code>examples/payroll/derivations.py</code>). Withholding uses the rate the backend last used for that month.
         </p>
       </section>
     </div>

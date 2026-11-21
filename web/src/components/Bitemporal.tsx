@@ -103,7 +103,6 @@ export function Bitemporal({ attribute, rows, versions, selected, onSelect }: Pr
           </g>
         );
       })}
-
     </svg>
   );
 }
