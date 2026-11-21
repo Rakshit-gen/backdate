@@ -1,34 +1,14 @@
 :root {
-  --paper: #edf1e7;
-  --sheet: #f6f8f2;
-  --ruling: #c9d6c3;
-  --graphite: #262820;
-  --carbon: #2b3a9c;
-  --redpen: #c0281a;
-  --muted: color-mix(in oklab, var(--graphite) 60%, var(--paper));
+  /* One dark theme: a deep blue-black sheet, pale ink, blue for links, red for corrections. */
+  --paper: #0d1124;
+  --sheet: #141932;
+  --ruling: #252d50;
+  --graphite: #e4e8f6;
+  --carbon: #9fb0ff;
+  --redpen: #ff7b6c;
+  --muted: color-mix(in oklab, var(--graphite) 62%, var(--paper));
   --wrap: 1180px;
   --pad: clamp(16px, 4vw, 56px);
-  color-scheme: light;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --paper: #161c36;
-    --sheet: #1d2443;
-    --ruling: #313c66;
-    --graphite: #dce2f4;
-    --carbon: #9aabff;
-    --redpen: #ff7a6b;
-    color-scheme: dark;
-  }
-}
-:root[data-theme="dark"] {
-  --paper: #161c36;
-  --sheet: #1d2443;
-  --ruling: #313c66;
-  --graphite: #dce2f4;
-  --carbon: #9aabff;
-  --redpen: #ff7a6b;
   color-scheme: dark;
 }
 
@@ -43,7 +23,7 @@ body {
   margin: 0;
   background: var(--paper);
   color: var(--graphite);
-  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-family: var(--font-sans), system-ui, sans-serif;
   font-size: 17px;
   line-height: 1.6;
   font-variant-numeric: tabular-nums;
@@ -71,20 +51,20 @@ h3 {
 h1 {
   font-size: clamp(34px, 5vw, 56px);
   line-height: 1.05;
-  font-stretch: 112%;
-  letter-spacing: -0.02em;
+  font-weight: 600;
+  letter-spacing: -0.035em;
 }
 h1.display {
   font-size: clamp(52px, 8vw, 104px);
-  line-height: 0.92;
-  font-weight: 800;
+  line-height: 0.95;
+  font-weight: 600;
   letter-spacing: -0.03em;
 }
 h2 {
   font-size: 24px;
   line-height: 1.25;
-  font-stretch: 108%;
-  letter-spacing: -0.01em;
+  font-weight: 600;
+  letter-spacing: -0.02em;
 }
 h3 {
   font-size: 18px;
@@ -95,8 +75,8 @@ p {
   max-width: 70ch;
 }
 code {
-  font-family: var(--font-archivo), monospace;
-  font-stretch: 75%;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.88em;
   background: color-mix(in oklab, var(--ruling) 45%, transparent);
   padding: 1px 5px;
 }
@@ -126,10 +106,9 @@ code {
   gap: 8px 32px;
 }
 .wordmark {
-  font-size: 22px;
-  font-weight: 800;
-  font-stretch: 112%;
-  letter-spacing: -0.02em;
+  font-size: 21px;
+  font-weight: 700;
+  letter-spacing: -0.04em;
   text-decoration: none;
 }
 .site-header nav {
@@ -738,7 +717,6 @@ tfoot td {
 .bars th {
   width: 92px;
   color: var(--graphite);
-  font-stretch: 100%;
   font-size: 15px;
   font-weight: 500;
 }
@@ -767,7 +745,6 @@ p.figure .muted {
   display: block;
   font-size: 16px;
   font-weight: 400;
-  font-stretch: 100%;
   margin-top: 8px;
 }
 
@@ -826,13 +803,11 @@ a.button:hover {
   text-decoration: none;
   font-size: clamp(20px, 2.4vw, 28px);
   font-weight: 700;
-  font-stretch: 108%;
   letter-spacing: -0.01em;
 }
 .next-step a .muted {
   font-size: 16px;
   font-weight: 500;
-  font-stretch: 100%;
   letter-spacing: 0;
 }
 .next-step a:hover {
@@ -863,142 +838,44 @@ a.button:hover {
 }
 
 /* ---- landing ---- */
-.hero-head {
-  display: grid;
-  grid-template-columns: minmax(0, 8fr) minmax(0, 4fr);
-  gap: 24px 48px;
-  align-items: end;
+.hero-band {
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid var(--ruling);
 }
-.hero h1.display {
-  font-size: clamp(38px, 5.4vw, 76px);
+.hero-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.hero-inner {
+  position: relative;
+  max-width: var(--wrap);
+  margin: 0 auto;
+  padding: clamp(72px, 14vh, 150px) var(--pad) clamp(56px, 10vh, 110px);
+  pointer-events: none;
+}
+.hero-inner a {
+  pointer-events: auto;
+}
+.hero-band h1.display {
+  font-size: clamp(40px, 6vw, 84px);
   line-height: 1;
-  max-width: 17ch;
+  max-width: 15ch;
   text-wrap: balance;
 }
-.hero .lede {
-  font-size: 18px;
+.hero-band .lede {
+  font-size: 19px;
+  max-width: 46ch;
+  margin-top: 28px;
 }
-.hero-tool {
-  margin-top: 40px;
-  padding: 24px 28px 28px;
-  background: var(--sheet);
-  border: 1px solid var(--ruling);
-  border-top: 3px solid var(--graphite);
+.hero-band .actions {
+  margin-top: 32px;
 }
-.hero-controls {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px 40px;
-}
-.hero-controls .field {
-  font-weight: 500;
-  font-size: 17px;
-}
-.hero-controls strong {
-  font-weight: 700;
-}
-.hero-chart {
-  display: block;
-  width: 100%;
-  height: auto;
-  margin: 12px 0 4px;
-  touch-action: pan-y;
-  cursor: ew-resize;
-  user-select: none;
-}
-.hero-after {
-  fill: color-mix(in oklab, var(--redpen) 6%, transparent);
-}
-.hero-base {
-  stroke: var(--graphite);
-  stroke-width: 1.5;
-}
-.hero-chart .m rect {
-  fill: var(--graphite);
-}
-.hero-chart .m.before rect {
-  fill: color-mix(in oklab, var(--graphite) 35%, var(--sheet));
-}
-.hero-chart .m.changed rect {
-  fill: var(--redpen);
-}
-.hero-chart .was {
-  stroke: var(--graphite);
-  stroke-width: 2.5;
-}
-.hero-chart .delta {
-  fill: var(--redpen);
-  font-size: 15px;
-  font-weight: 700;
-  font-stretch: 85%;
-}
-.hero-chart .mlabel {
-  fill: var(--muted);
-  font-size: 15px;
-  font-stretch: 85%;
-}
-.hero-handle line {
-  stroke: var(--carbon);
-  stroke-width: 2;
-}
-.hero-handle rect {
-  fill: var(--carbon);
-}
-.hero-handle text {
-  fill: var(--carbon);
-  font-size: 16px;
-  font-weight: 700;
-}
-.hero-result {
-  font-size: clamp(19px, 2vw, 24px);
-  line-height: 1.4;
-  max-width: 48ch;
-  margin: 8px 0 20px;
-}
-.small-inline {
-  font-size: 14px;
-}
-.code {
-  margin: 16px 0 0;
-  padding: 16px 18px;
-  overflow-x: auto;
-  background: var(--sheet);
-  border: 1px solid var(--ruling);
-  font:
-    14px/1.55 ui-monospace,
-    "SF Mono",
-    Menlo,
-    monospace;
-}
-@media (min-width: 761px) {
-  .code-split {
-    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
-  }
-}
-.reads {
-  margin-top: 16px;
-}
-.reads caption {
-  text-align: left;
-  padding-bottom: 4px;
-  font-weight: 600;
-}
-@media (max-width: 760px) {
-  .hero-head,
-  .hero-controls {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .hero-tool {
-    padding: 16px;
-    margin-left: calc(-1 * var(--pad) / 2);
-    margin-right: calc(-1 * var(--pad) / 2);
-  }
-  .hero-chart .delta {
-    display: none;
-  }
-  .hero-chart .mlabel {
-    font-size: 22px;
-  }
+.home-page {
+  padding-top: 40px;
 }
 
 /* Long paths like tests/test_races.py::test_name must not widen the page on phones. */
