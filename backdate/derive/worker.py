@@ -7,6 +7,8 @@ Workers are separate processes. They share nothing except Postgres:
   token. The claim commits right away; no lock is held while computing.
 * ``run_one`` computes outside any transaction, then hands off to
   ``backdate.derive.save``.
+* While a derivation runs, a heartbeat thread extends the lease every third
+  of its length, so a slow derivation is not fenced off just for being slow.
 * A worker that dies mid-compute leaves a lease that expires. Another worker
   can then claim the row, which bumps the token, so if the first worker
   wakes up and tries to save, the save is fenced off.
@@ -15,13 +17,15 @@ Workers are separate processes. They share nothing except Postgres:
 from __future__ import annotations
 
 import logging
+import threading
 import time
 import traceback
-from collections.abc import Iterable
+from collections.abc import Iterable, Iterator
+from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import timedelta
 
-from django.db import connection, transaction
+from django.db import connection, connections, transaction
 from django.db.models.expressions import RawSQL
 
 from backdate import conf, reads
@@ -76,9 +80,53 @@ class RunResult:
     duration_ms: float
 
 
+_EXTEND_SQL = """
+UPDATE backdate_computation
+   SET lease_expires_at = clock_timestamp() + make_interval(secs => %s)
+ WHERE id = %s AND lease_token = %s AND lease_owner <> ''
+"""
+
+
+def extend_lease(claim: Claim) -> bool:
+    """Push the lease out by a full term. False once the claim is saved or fenced."""
+    with connection.cursor() as cur:
+        cur.execute(_EXTEND_SQL, [conf.get_int("LEASE_SECONDS"), claim.computation_id, claim.token])
+        return bool(cur.rowcount == 1)
+
+
+@contextmanager
+def heartbeat(claim: Claim) -> Iterator[None]:
+    """Keep ``claim`` leased while the body runs.
+
+    The beat runs on its own thread, so it gets its own database connection and
+    commits each extension at once. It stops as soon as an extension matches no
+    row: the save cleared the lease, or another worker holds a newer token.
+    """
+    stop = threading.Event()
+    every = conf.get_int("LEASE_SECONDS") / 3
+
+    def beat() -> None:
+        try:
+            while not stop.wait(every):
+                if not extend_lease(claim):
+                    return
+                metrics.lease_extensions.inc()
+        finally:
+            connections.close_all()  # only this thread's connection
+
+    thread = threading.Thread(target=beat, name=f"lease-{claim.computation_id}", daemon=True)
+    thread.start()
+    try:
+        yield
+    finally:
+        stop.set()
+        thread.join()
+
+
 def run_one(claim: Claim) -> RunResult:
     started = time.perf_counter()
-    outcome = _run(claim)
+    with heartbeat(claim):
+        outcome = _run(claim)
     elapsed = (time.perf_counter() - started) * 1000
     log.info(
         "computed",
