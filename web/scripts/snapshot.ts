@@ -13,7 +13,9 @@ const corrections = (scene.changesets as { version: number; changes: Change[] }[
   .map((c) => `v${c.version} changes ${c.changes.map((x) => `${x.attribute} from ${x.from}`).join(", ")}`);
 const note =
   `Recorded from a real run at version ${scene.clock.version}: seeded employees, then ` +
-  (corrections.length ? `these corrections to employee ${scene.employee}: ${corrections.join("; ")}. ` : "no corrections. ") +
+  (corrections.length
+    ? `these corrections to employee ${scene.employee}: ${corrections.join("; ")}. `
+    : "no corrections. ") +
   "Workers recomputed after each one. Nothing in it is made up.";
 writeFileSync(
   new URL("../src/data/recording.json", import.meta.url),
