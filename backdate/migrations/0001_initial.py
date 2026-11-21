@@ -11,198 +11,430 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         # GiST indexes over (tenant, entity, attribute, range) need btree ops for the scalar columns.
         BtreeGistExtension(),
         migrations.CreateModel(
-            name='Tenant',
+            name="Tenant",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('slug', models.SlugField(max_length=64, unique=True)),
-                ('name', models.CharField(max_length=200)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
+                ("slug", models.SlugField(max_length=64, unique=True)),
+                ("name", models.CharField(max_length=200)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
             ],
         ),
         migrations.CreateModel(
-            name='TenantClock',
+            name="TenantClock",
             fields=[
-                ('tenant', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, primary_key=True, serialize=False, to='backdate.tenant')),
-                ('version', models.BigIntegerField(default=0)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
+                (
+                    "tenant",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        primary_key=True,
+                        serialize=False,
+                        to="backdate.tenant",
+                    ),
+                ),
+                ("version", models.BigIntegerField(default=0)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
             ],
         ),
         migrations.CreateModel(
-            name='Computation',
+            name="Computation",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('derivation', models.CharField(max_length=100)),
-                ('key', models.CharField(max_length=300)),
-                ('status', models.CharField(choices=[('pending', 'Pending'), ('fresh', 'Fresh'), ('stale', 'Stale'), ('failed', 'Failed')], default='pending', max_length=16)),
-                ('code_version', models.CharField(blank=True, max_length=40)),
-                ('result', models.JSONField(blank=True, null=True)),
-                ('result_version', models.BigIntegerField(blank=True, null=True)),
-                ('result_seq', models.IntegerField(default=0)),
-                ('stale_since_version', models.BigIntegerField(blank=True, null=True)),
-                ('attempts', models.IntegerField(default=0)),
-                ('not_before', models.DateTimeField(blank=True, null=True)),
-                ('last_error', models.TextField(blank=True)),
-                ('lease_owner', models.CharField(blank=True, max_length=100)),
-                ('lease_token', models.BigIntegerField(default=0)),
-                ('lease_expires_at', models.DateTimeField(blank=True, null=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('tenant', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='backdate.tenant')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
+                ("derivation", models.CharField(max_length=100)),
+                ("key", models.CharField(max_length=300)),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("pending", "Pending"),
+                            ("fresh", "Fresh"),
+                            ("stale", "Stale"),
+                            ("failed", "Failed"),
+                        ],
+                        default="pending",
+                        max_length=16,
+                    ),
+                ),
+                ("code_version", models.CharField(blank=True, max_length=40)),
+                ("result", models.JSONField(blank=True, null=True)),
+                ("result_version", models.BigIntegerField(blank=True, null=True)),
+                ("result_seq", models.IntegerField(default=0)),
+                ("stale_since_version", models.BigIntegerField(blank=True, null=True)),
+                ("attempts", models.IntegerField(default=0)),
+                ("not_before", models.DateTimeField(blank=True, null=True)),
+                ("last_error", models.TextField(blank=True)),
+                ("lease_owner", models.CharField(blank=True, max_length=100)),
+                ("lease_token", models.BigIntegerField(default=0)),
+                ("lease_expires_at", models.DateTimeField(blank=True, null=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "tenant",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="backdate.tenant"
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Changeset',
+            name="Changeset",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('version', models.BigIntegerField()),
-                ('recorded_at', models.DateTimeField(auto_now_add=True)),
-                ('actor', models.CharField(blank=True, max_length=200)),
-                ('reason', models.TextField(blank=True)),
-                ('idempotency_key', models.CharField(blank=True, max_length=200, null=True)),
-                ('tenant', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='backdate.tenant')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
+                ("version", models.BigIntegerField()),
+                ("recorded_at", models.DateTimeField(auto_now_add=True)),
+                ("actor", models.CharField(blank=True, max_length=200)),
+                ("reason", models.TextField(blank=True)),
+                ("idempotency_key", models.CharField(blank=True, max_length=200)),
+                (
+                    "tenant",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="backdate.tenant"
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='ChangeRange',
+            name="ChangeRange",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('version', models.BigIntegerField()),
-                ('entity', models.CharField(max_length=200)),
-                ('attribute', models.CharField(max_length=100)),
-                ('valid', django.contrib.postgres.fields.ranges.DateRangeField()),
-                ('changeset', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='ranges', to='backdate.changeset')),
-                ('tenant', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='backdate.tenant')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
+                ("version", models.BigIntegerField()),
+                ("entity", models.CharField(max_length=200)),
+                ("attribute", models.CharField(max_length=100)),
+                ("valid", django.contrib.postgres.fields.ranges.DateRangeField()),
+                (
+                    "changeset",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="ranges",
+                        to="backdate.changeset",
+                    ),
+                ),
+                (
+                    "tenant",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="backdate.tenant"
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='ApiKey',
+            name="ApiKey",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('prefix', models.CharField(max_length=16, unique=True)),
-                ('secret_hash', models.CharField(max_length=64)),
-                ('scopes', django.contrib.postgres.fields.ArrayField(base_field=models.CharField(max_length=32), default=list)),
-                ('label', models.CharField(blank=True, max_length=100)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('revoked_at', models.DateTimeField(blank=True, null=True)),
-                ('tenant', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='api_keys', to='backdate.tenant')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
+                ("prefix", models.CharField(max_length=16, unique=True)),
+                ("secret_hash", models.CharField(max_length=64)),
+                (
+                    "scopes",
+                    django.contrib.postgres.fields.ArrayField(
+                        base_field=models.CharField(max_length=32), default=list
+                    ),
+                ),
+                ("label", models.CharField(blank=True, max_length=100)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("revoked_at", models.DateTimeField(blank=True, null=True)),
+                (
+                    "tenant",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="api_keys",
+                        to="backdate.tenant",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='DerivedRead',
+            name="DerivedRead",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('observed_seq', models.IntegerField()),
-                ('reader', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='derived_reads', to='backdate.computation')),
-                ('source', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='dependents', to='backdate.computation')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
+                ("observed_seq", models.IntegerField()),
+                (
+                    "reader",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="derived_reads",
+                        to="backdate.computation",
+                    ),
+                ),
+                (
+                    "source",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="dependents",
+                        to="backdate.computation",
+                    ),
+                ),
             ],
             options={
-                'constraints': [models.UniqueConstraint(fields=('reader', 'source'), name='derivedread_unique')],
+                "constraints": [
+                    models.UniqueConstraint(fields=("reader", "source"), name="derivedread_unique")
+                ],
             },
         ),
         migrations.CreateModel(
-            name='Restatement',
+            name="Restatement",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('seq', models.IntegerField()),
-                ('from_version', models.BigIntegerField(blank=True, null=True)),
-                ('to_version', models.BigIntegerField()),
-                ('previous', models.JSONField(blank=True, null=True)),
-                ('current', models.JSONField()),
-                ('delta', models.JSONField()),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('txid', models.BigIntegerField(db_default=django.db.models.functions.comparison.Cast(django.db.models.functions.comparison.Cast(models.Func(function='pg_current_xact_id', output_field=models.TextField()), models.TextField()), models.BigIntegerField()))),
-                ('computation', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='restatements', to='backdate.computation')),
-                ('tenant', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='backdate.tenant')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
+                ("seq", models.IntegerField()),
+                ("from_version", models.BigIntegerField(blank=True, null=True)),
+                ("to_version", models.BigIntegerField()),
+                ("previous", models.JSONField(blank=True, null=True)),
+                ("current", models.JSONField()),
+                ("delta", models.JSONField()),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "txid",
+                    models.BigIntegerField(
+                        db_default=django.db.models.functions.comparison.Cast(
+                            django.db.models.functions.comparison.Cast(
+                                models.Func(
+                                    function="pg_current_xact_id", output_field=models.TextField()
+                                ),
+                                models.TextField(),
+                            ),
+                            models.BigIntegerField(),
+                        )
+                    ),
+                ),
+                (
+                    "computation",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="restatements",
+                        to="backdate.computation",
+                    ),
+                ),
+                (
+                    "tenant",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="backdate.tenant"
+                    ),
+                ),
             ],
             options={
-                'indexes': [models.Index(fields=['tenant', 'txid', 'id'], name='restatement_feed_idx')],
-                'constraints': [models.UniqueConstraint(fields=('computation', 'seq'), name='restatement_seq_unique')],
+                "indexes": [
+                    models.Index(fields=["tenant", "txid", "id"], name="restatement_feed_idx")
+                ],
+                "constraints": [
+                    models.UniqueConstraint(
+                        fields=("computation", "seq"), name="restatement_seq_unique"
+                    )
+                ],
             },
         ),
         migrations.CreateModel(
-            name='ReadRange',
+            name="ReadRange",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('entity', models.CharField(max_length=200)),
-                ('attribute', models.CharField(max_length=100)),
-                ('valid', django.contrib.postgres.fields.ranges.DateRangeField()),
-                ('computation', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='reads', to='backdate.computation')),
-                ('tenant', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='backdate.tenant')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
+                ("entity", models.CharField(max_length=200)),
+                ("attribute", models.CharField(max_length=100)),
+                ("valid", django.contrib.postgres.fields.ranges.DateRangeField()),
+                (
+                    "computation",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="reads",
+                        to="backdate.computation",
+                    ),
+                ),
+                (
+                    "tenant",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="backdate.tenant"
+                    ),
+                ),
             ],
             options={
-                'indexes': [django.contrib.postgres.indexes.GistIndex(fields=['tenant', 'entity', 'attribute', 'valid'], name='readrange_gist')],
+                "indexes": [
+                    django.contrib.postgres.indexes.GistIndex(
+                        fields=["tenant", "entity", "attribute", "valid"], name="readrange_gist"
+                    )
+                ],
             },
         ),
         migrations.CreateModel(
-            name='IdempotencyRecord',
+            name="IdempotencyRecord",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('key', models.CharField(max_length=200)),
-                ('request_hash', models.CharField(max_length=64)),
-                ('status_code', models.IntegerField()),
-                ('response', models.JSONField()),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('tenant', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='backdate.tenant')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
+                ("key", models.CharField(max_length=200)),
+                ("request_hash", models.CharField(max_length=64)),
+                ("status_code", models.IntegerField()),
+                ("response", models.JSONField()),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "tenant",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="backdate.tenant"
+                    ),
+                ),
             ],
             options={
-                'indexes': [models.Index(fields=['created_at'], name='idempotency_created_idx')],
-                'constraints': [models.UniqueConstraint(fields=('tenant', 'key'), name='idempotency_unique')],
+                "indexes": [models.Index(fields=["created_at"], name="idempotency_created_idx")],
+                "constraints": [
+                    models.UniqueConstraint(fields=("tenant", "key"), name="idempotency_unique")
+                ],
             },
         ),
         migrations.CreateModel(
-            name='Fact',
+            name="Fact",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('entity', models.CharField(max_length=200)),
-                ('attribute', models.CharField(max_length=100)),
-                ('value', models.JSONField()),
-                ('valid', django.contrib.postgres.fields.ranges.DateRangeField()),
-                ('tx_from', models.BigIntegerField()),
-                ('tx_to', models.BigIntegerField(blank=True, null=True)),
-                ('changeset', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='facts', to='backdate.changeset')),
-                ('tenant', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='backdate.tenant')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
+                ("entity", models.CharField(max_length=200)),
+                ("attribute", models.CharField(max_length=100)),
+                ("value", models.JSONField()),
+                ("valid", django.contrib.postgres.fields.ranges.DateRangeField()),
+                ("tx_from", models.BigIntegerField()),
+                ("tx_to", models.BigIntegerField(blank=True, null=True)),
+                (
+                    "changeset",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="facts",
+                        to="backdate.changeset",
+                    ),
+                ),
+                (
+                    "tenant",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="backdate.tenant"
+                    ),
+                ),
             ],
             options={
-                'indexes': [models.Index(fields=['tenant', 'entity', 'attribute', 'tx_from'], name='fact_history_idx')],
-                'constraints': [django.contrib.postgres.constraints.ExclusionConstraint(condition=models.Q(('tx_to__isnull', True)), expressions=[(models.F('tenant'), '='), (models.F('entity'), '='), (models.F('attribute'), '='), (models.F('valid'), '&&')], name='fact_current_no_overlap'), models.CheckConstraint(condition=models.Q(('tx_to__isnull', True), ('tx_to__gt', models.F('tx_from')), _connector='OR'), name='fact_tx_order'), models.CheckConstraint(condition=models.Q(('valid__isempty', False), ('valid__lower_inf', False)), name='fact_valid_bounded_below')],
+                "indexes": [
+                    models.Index(
+                        fields=["tenant", "entity", "attribute", "tx_from"], name="fact_history_idx"
+                    )
+                ],
+                "constraints": [
+                    django.contrib.postgres.constraints.ExclusionConstraint(
+                        condition=models.Q(("tx_to__isnull", True)),
+                        expressions=[
+                            (models.F("tenant"), "="),
+                            (models.F("entity"), "="),
+                            (models.F("attribute"), "="),
+                            (models.F("valid"), "&&"),
+                        ],
+                        name="fact_current_no_overlap",
+                    ),
+                    models.CheckConstraint(
+                        condition=models.Q(
+                            ("tx_to__isnull", True),
+                            ("tx_to__gt", models.F("tx_from")),
+                            _connector="OR",
+                        ),
+                        name="fact_tx_order",
+                    ),
+                    models.CheckConstraint(
+                        condition=models.Q(("valid__isempty", False), ("valid__lower_inf", False)),
+                        name="fact_valid_bounded_below",
+                    ),
+                ],
             },
         ),
         migrations.AddIndex(
-            model_name='computation',
-            index=models.Index(condition=models.Q(('status__in', ['pending', 'stale'])), fields=['not_before', 'id'], name='computation_runnable_idx'),
+            model_name="computation",
+            index=models.Index(
+                condition=models.Q(("status__in", ["pending", "stale"])),
+                fields=["not_before", "id"],
+                name="computation_runnable_idx",
+            ),
         ),
         migrations.AddIndex(
-            model_name='computation',
-            index=models.Index(condition=models.Q(('status__in', ['pending', 'stale'])), fields=['tenant'], name='computation_backlog_idx'),
+            model_name="computation",
+            index=models.Index(
+                condition=models.Q(("status__in", ["pending", "stale"])),
+                fields=["tenant"],
+                name="computation_backlog_idx",
+            ),
         ),
         migrations.AddConstraint(
-            model_name='computation',
-            constraint=models.UniqueConstraint(fields=('tenant', 'derivation', 'key'), name='computation_identity'),
+            model_name="computation",
+            constraint=models.UniqueConstraint(
+                fields=("tenant", "derivation", "key"), name="computation_identity"
+            ),
         ),
         migrations.AddConstraint(
-            model_name='computation',
-            constraint=models.CheckConstraint(condition=models.Q(models.Q(('status', 'fresh'), _negated=True), ('result_version__isnull', False), _connector='OR'), name='computation_fresh_has_version'),
+            model_name="computation",
+            constraint=models.CheckConstraint(
+                condition=models.Q(
+                    models.Q(("status", "fresh"), _negated=True),
+                    ("result_version__isnull", False),
+                    _connector="OR",
+                ),
+                name="computation_fresh_has_version",
+            ),
         ),
         migrations.AddConstraint(
-            model_name='changeset',
-            constraint=models.UniqueConstraint(fields=('tenant', 'version'), name='changeset_version_unique'),
+            model_name="changeset",
+            constraint=models.UniqueConstraint(
+                fields=("tenant", "version"), name="changeset_version_unique"
+            ),
         ),
         migrations.AddIndex(
-            model_name='changerange',
-            index=django.contrib.postgres.indexes.GistIndex(fields=['tenant', 'entity', 'attribute', 'valid'], name='changerange_lookup_gist'),
+            model_name="changerange",
+            index=django.contrib.postgres.indexes.GistIndex(
+                fields=["tenant", "entity", "attribute", "valid"], name="changerange_lookup_gist"
+            ),
         ),
         migrations.AddIndex(
-            model_name='changerange',
-            index=models.Index(fields=['tenant', 'version'], name='changerange_version_idx'),
+            model_name="changerange",
+            index=models.Index(fields=["tenant", "version"], name="changerange_version_idx"),
         ),
     ]

@@ -124,7 +124,7 @@ def apply(
                 version=version,
                 actor=actor,
                 reason=reason,
-                idempotency_key=idempotency_key,
+                idempotency_key=idempotency_key or "",
             )
             changes = _persist(tenant_id, changeset, plans)
             invalidated = invalidate(tenant_id, version, changes)
@@ -212,7 +212,7 @@ def _plan(tenant_id: int, ops: Sequence[Op]) -> list[_Plan]:
             for (row_id, _, _), (span, value) in zip(rows, before, strict=True)
             if (span, _freeze(value)) not in after_set
         ]
-        insert = [(span, value) for span, value in after if (span, _freeze(value)) not in before_set]
+        insert = [(s, v) for s, v in after if (s, _freeze(v)) not in before_set]
         plans.append(_Plan(entity, attribute, close_ids, insert, changed))
     return plans
 

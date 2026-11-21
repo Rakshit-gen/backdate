@@ -12,6 +12,7 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from datetime import date
+from itertools import pairwise
 from typing import Any
 
 from backdate.intervals import Span, coalesce
@@ -65,7 +66,7 @@ def changed_spans(
     if not cuts:
         return []
     points = sorted(cuts)
-    segments = [Span(a, b) for a, b in zip(points, points[1:], strict=False)]
+    segments = [Span(a, b) for a, b in pairwise(points)]
     if open_ended:
         segments.append(Span(points[-1], None))
 

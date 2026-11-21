@@ -18,7 +18,7 @@ from backdate.intervals import Span
 from backdate.models import Computation
 
 
-class NotReady(Exception):  # noqa: N818
+class NotReady(Exception):
     """A derivation needs another result that is not computed yet.
 
     The worker puts the reader back in the queue and makes sure the source

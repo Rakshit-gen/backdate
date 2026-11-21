@@ -46,12 +46,13 @@ ignore = [
   "PLR2004",  # magic numbers are fine in tests and benches
   "TRY003",
   "RUF012",   # Django Meta attributes are class-level lists by convention
+  "DJ008",    # internal rows do not need a __str__
 ]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["S101", "S311", "PLR0915", "S105", "S106"]
 "bench/**" = ["S101", "S311", "T201"]
-"**/migrations/**" = ["E501", "RUF"]
+"**/migrations/**" = ["E501", "RUF", "I001"]
 
 [tool.mypy]
 python_version = "3.12"

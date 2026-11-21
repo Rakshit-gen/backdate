@@ -26,7 +26,7 @@ def ready(request: HttpRequest) -> JsonResponse:
         plan = executor.migration_plan(executor.loader.graph.leaf_nodes())
         if plan:
             problems.append(f"{len(plan)} unapplied migrations")
-    except Exception as exc:  # noqa: BLE001 - any failure means not ready
+    except Exception as exc:  # any failure means not ready
         problems.append(f"database: {type(exc).__name__}")
     if problems:
         return JsonResponse({"status": "unavailable", "problems": problems}, status=503)

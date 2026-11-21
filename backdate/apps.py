@@ -7,6 +7,6 @@ class BackdateConfig(AppConfig):
     verbose_name = "backdate"
 
     def ready(self) -> None:
-        from backdate.derive.registry import load_configured_modules
+        from backdate.derive.registry import load_configured_modules  # noqa: PLC0415
 
         load_configured_modules()

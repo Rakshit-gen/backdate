@@ -62,7 +62,7 @@ class Changeset(models.Model):
     recorded_at = models.DateTimeField(auto_now_add=True)
     actor = models.CharField(max_length=200, blank=True)
     reason = models.TextField(blank=True)
-    idempotency_key = models.CharField(max_length=200, null=True, blank=True)
+    idempotency_key = models.CharField(max_length=200, blank=True)
 
     class Meta:
         constraints = [
@@ -229,8 +229,10 @@ class DerivedRead(models.Model):
 
 def current_txid() -> Cast:
     # xid8 has no direct cast to bigint, so go through text.
-    return Cast(Cast(Func(function="pg_current_xact_id", output_field=TextField()), TextField()),
-                BigIntegerField())
+    return Cast(
+        Cast(Func(function="pg_current_xact_id", output_field=TextField()), TextField()),
+        BigIntegerField(),
+    )
 
 
 class Restatement(models.Model):
