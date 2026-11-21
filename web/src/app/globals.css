@@ -180,7 +180,7 @@ code {
 .page {
   max-width: var(--wrap);
   margin: 0 auto;
-  padding: 56px var(--pad) 96px;
+  padding: 56px var(--pad) 64px;
 }
 .page-head {
   display: grid;
@@ -783,4 +783,89 @@ p.figure .muted {
 .wide > .bitemporal,
 .wide > .loom {
   min-width: 720px;
+}
+
+/* ---- wayfinding ---- */
+.skip {
+  position: absolute;
+  left: -9999px;
+}
+.skip:focus {
+  left: var(--pad);
+  top: 8px;
+  z-index: 10;
+  padding: 6px 12px;
+  background: var(--graphite);
+  color: var(--paper);
+}
+.home-intro .lede {
+  margin-bottom: 24px;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 24px;
+}
+a.button {
+  display: inline-block;
+  font-weight: 600;
+  color: var(--paper);
+  background: var(--graphite);
+  border: 1px solid var(--graphite);
+  padding: 9px 18px;
+  text-decoration: none;
+}
+a.button:hover {
+  color: var(--paper);
+  background: var(--carbon);
+  border-color: var(--carbon);
+}
+.next-step {
+  max-width: var(--wrap);
+  margin: 0 auto;
+  padding: 0 var(--pad) 72px;
+}
+.next-step a {
+  display: grid;
+  gap: 2px;
+  padding: 20px 0;
+  border-top: 2px solid var(--graphite);
+  text-decoration: none;
+  font-size: clamp(20px, 2.4vw, 28px);
+  font-weight: 700;
+  font-stretch: 108%;
+  letter-spacing: -0.01em;
+}
+.next-step a .muted {
+  font-size: 16px;
+  font-weight: 500;
+  font-stretch: 100%;
+  letter-spacing: 0;
+}
+.next-step a:hover {
+  color: var(--carbon);
+}
+@media (max-width: 760px) {
+  .site-header nav {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    max-width: 100%;
+    scrollbar-width: none;
+  }
+  .site-header nav a {
+    white-space: nowrap;
+  }
+}
+.progress {
+  display: block;
+  height: 4px;
+  margin: 10px 0;
+  background: color-mix(in oklab, var(--carbon) 18%, transparent);
+}
+.progress span {
+  display: block;
+  height: 100%;
+  background: var(--carbon);
+  transition: width 0.3s;
 }

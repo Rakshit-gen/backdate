@@ -35,11 +35,19 @@ export function Home() {
     <div className="page">
       <div className="home-title">
         <h1 className="display">backdate</h1>
-        <p className="lede">
-          Bitemporal facts for Django on Postgres. Correct a salary back in March, and only the pay results that read
-          March onwards are recomputed, under leases, with every change published as a correction you can post to a
-          ledger.
-        </p>
+        <div className="home-intro">
+          <p className="lede">
+            Bitemporal facts for Django on Postgres. Correct a salary back in March, and only the pay results that read
+            March onwards are recomputed, under leases, with every change published as a correction you can post to a
+            ledger.
+          </p>
+          <div className="actions">
+            <Link className="button" href="/payroll">
+              Backdate a raise
+            </Link>
+            <Link href="/invalidation">See what the last one touched</Link>
+          </div>
+        </div>
       </div>
 
       <section className="block">

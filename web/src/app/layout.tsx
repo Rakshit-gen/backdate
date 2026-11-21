@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Archivo } from "next/font/google";
-import { Header } from "@/components/Header";
+import { Header, NextStep } from "@/components/Header";
 import { SceneProvider } from "@/components/SceneProvider";
 import { SourceNote } from "@/components/SourceNote";
 import { getSource } from "@/lib/source";
@@ -31,7 +31,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <SceneProvider source={source}>
           <Header />
           <SourceNote />
-          <main>{children}</main>
+          <main id="main">
+            {children}
+            <NextStep />
+          </main>
         </SceneProvider>
       </body>
     </html>
