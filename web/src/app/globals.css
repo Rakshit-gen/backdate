@@ -244,3 +244,15 @@ button.link:hover:not([disabled]) { background: none; color: var(--carbon); }
 tfoot td { border-bottom: 0; border-top: 1px solid var(--graphite); font-weight: 600; }
 .ledger table { table-layout: fixed; }
 .ledger th:first-child { width: 34%; }
+
+/* ---- benchmarks ---- */
+.bars { margin-bottom: 20px; table-layout: fixed; }
+.bars td.num { width: 72px; }
+.bars caption { text-align: left; font-size: 14px; font-weight: 600; padding-bottom: 4px; }
+.bars th { width: 92px; color: var(--graphite); font-stretch: 100%; font-size: 15px; font-weight: 500; }
+.bars td:nth-child(2) { width: auto; }
+.bars td.num { padding-right: 0; font-weight: 600; }
+.bar { display: block; height: 14px; background: var(--graphite); }
+.bar.accent { background: var(--carbon); }
+p.figure { font-size: 40px; font-weight: 700; font-stretch: 90%; line-height: 1.1; }
+p.figure .muted { display: block; font-size: 16px; font-weight: 400; font-stretch: 100%; margin-top: 8px; }
