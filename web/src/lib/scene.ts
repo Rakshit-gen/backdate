@@ -62,6 +62,13 @@ export function byDerivation(comps: Computation[], name: string): (Computation |
 }
 
 /** A row first written at v, replacing something already known: a correction. */
+/**
+ * A row written at version v corrects the past if, for some of its dates, the previous version
+ * believed a different value. The untouched piece left over when a write splits a row is not one.
+ */
 export function isCorrection(rows: HistoryRow[], row: HistoryRow, v: number): boolean {
-  return row.tx_from === v && knownAt(rows, v - 1).length > 0;
+  if (row.tx_from !== v) return false;
+  return knownAt(rows, v - 1).some(
+    (old) => overlaps(old, row) && JSON.stringify(old.value) !== JSON.stringify(row.value),
+  );
 }

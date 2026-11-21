@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { affectedBy, knownAt, overlaps, yearFraction } from "./scene";
+import { affectedBy, isCorrection, knownAt, overlaps, yearFraction } from "./scene";
 import type { Changeset, Graph } from "./types";
 
 describe("overlaps", () => {
@@ -55,4 +55,18 @@ describe("affectedBy", () => {
       [3, 1],
     ]);
   });
+});
+
+it("a split leftover is not a correction, a changed value is", () => {
+  // The real v3 and v4 rows for employee 7's salary.
+  const rows = [
+    { from: "2024-03-28", to: null, value: 5_700_000, tx_from: 2, tx_to: 3 },
+    { from: "2024-03-01", to: null, value: 7_300_000, tx_from: 3, tx_to: 4 },
+    { from: "2024-03-01", to: "2024-06-01", value: 7_300_000, tx_from: 4, tx_to: null },
+    { from: "2024-06-01", to: null, value: 7_800_000, tx_from: 4, tx_to: null },
+  ];
+  expect(isCorrection(rows, rows[0]!, 2)).toBe(false);
+  expect(isCorrection(rows, rows[1]!, 3)).toBe(true);
+  expect(isCorrection(rows, rows[2]!, 4)).toBe(false);
+  expect(isCorrection(rows, rows[3]!, 4)).toBe(true);
 });
