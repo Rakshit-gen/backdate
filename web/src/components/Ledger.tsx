@@ -48,10 +48,9 @@ void main() {
   float edge = inBar * (1.0 - step(x0 + 1.5, px.x) * step(px.x, x1 - 1.5) * step(0.32 + 1.5 / rowH, fy) * step(fy, 0.68 - 1.5 / rowH));
 
   float rule = 1.0 - smoothstep(0.0, 1.0, abs(fract(px.x / colW + 0.5) - 0.5) * colW);
-  float base = 1.0 - smoothstep(0.0, 1.0, abs(fy - 0.5) * rowH - 0.0);
 
   vec3 col = uInk;
-  float a = inBar * 0.07 + edge * 0.16 + rule * 0.07 + base * 0.0;
+  float a = inBar * 0.12 + edge * 0.26 + rule * 0.09;
 
   // Corrections: ink runs right from the corrected month, then fades.
   float red = 0.0;
@@ -67,7 +66,7 @@ void main() {
     mark = max(mark, (1.0 - smoothstep(0.0, 1.2, abs(px.x - h.x))) * fade);
   }
   col = mix(col, uRed, clamp(red * 1.4, 0.0, 1.0));
-  a = max(a, inBar * red * 0.55 + edge * red * 0.3);
+  a = max(a, inBar * red * 0.8 + edge * red * 0.4);
   col = mix(col, uRed, mark);
   a = max(a, mark * 0.8);
 
