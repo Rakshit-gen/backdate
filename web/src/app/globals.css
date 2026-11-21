@@ -232,3 +232,15 @@ button.link:hover:not([disabled]) { background: none; color: var(--carbon); }
 .fence-view table { margin: 8px 0 20px; }
 .fence-view th { width: 45%; }
 @media (max-width: 760px) { .fence { grid-template-columns: 1fr; } }
+
+/* ---- feed ---- */
+.feed-controls { display: flex; flex-wrap: wrap; gap: 16px 48px; align-items: end; }
+.feed-controls .scrub { margin: 0; min-width: 260px; flex: 1; max-width: 420px; }
+.balance p { font-size: 18px; max-width: none; padding: 12px 0; border-top: 2px solid var(--graphite); border-bottom: 1px solid var(--ruling); margin: 0; }
+.ledger { margin-top: 40px; }
+.ledger h2 { margin-bottom: 8px; font-size: 20px; }
+.ledger h2 .muted { font-weight: 400; font-size: 16px; }
+.ledger table { max-width: 760px; }
+tfoot td { border-bottom: 0; border-top: 1px solid var(--graphite); font-weight: 600; }
+.ledger table { table-layout: fixed; }
+.ledger th:first-child { width: 34%; }
