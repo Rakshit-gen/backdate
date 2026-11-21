@@ -208,8 +208,11 @@ def drain(
 
 
 def _has_delayed(tenant_id: int | None) -> bool:
+    """Is anything waiting on a retry delay? Rows leased to someone else do not count."""
     qs = Computation.objects.filter(
-        status__in=[Computation.Status.PENDING, Computation.Status.STALE]
+        status__in=[Computation.Status.PENDING, Computation.Status.STALE],
+        not_before__isnull=False,
+        lease_expires_at__isnull=True,
     )
     if tenant_id:
         qs = qs.filter(tenant_id=tenant_id)
