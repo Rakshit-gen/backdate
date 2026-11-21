@@ -37,28 +37,43 @@ from backdate.observability import metrics
 
 log = logging.getLogger("backdate.worker")
 
+# Fair across tenants: each tenant offers its oldest runnable rows, locked with
+# SKIP LOCKED, and the batch takes every tenant's first row, then every
+# tenant's second, and so on. A tenant with a huge backlog then gets one slot
+# per round like everyone else, instead of every slot until it drains.
 _CLAIM_SQL = """
+WITH offered AS (
+    SELECT c.id, c.tenant_id, c.not_before
+      FROM backdate_tenant t
+     CROSS JOIN LATERAL (
+           SELECT id, tenant_id, not_before FROM backdate_computation
+            WHERE tenant_id = t.id
+              AND status IN ('pending', 'stale')
+              AND (not_before IS NULL OR not_before <= clock_timestamp())
+              AND (lease_expires_at IS NULL OR lease_expires_at < clock_timestamp())
+            ORDER BY not_before NULLS FIRST, id
+            LIMIT %(limit)s
+            FOR UPDATE SKIP LOCKED) c
+     WHERE TRUE {tenant_filter}
+),
+ranked AS (
+    SELECT id,
+           row_number() OVER (PARTITION BY tenant_id ORDER BY not_before NULLS FIRST, id) AS turn
+      FROM offered
+)
 UPDATE backdate_computation c
    SET lease_owner = %(owner)s,
        lease_token = c.lease_token + 1,
        lease_expires_at = clock_timestamp() + make_interval(secs => %(lease)s),
        attempts = c.attempts + 1,
        updated_at = now()
- WHERE c.id IN (
-       SELECT id FROM backdate_computation
-        WHERE status IN ('pending', 'stale')
-          AND (not_before IS NULL OR not_before <= clock_timestamp())
-          AND (lease_expires_at IS NULL OR lease_expires_at < clock_timestamp())
-          {tenant_filter}
-        ORDER BY not_before NULLS FIRST, id
-        LIMIT %(limit)s
-        FOR UPDATE SKIP LOCKED)
+ WHERE c.id IN (SELECT id FROM ranked ORDER BY turn, id LIMIT %(limit)s)
 RETURNING c.id, c.tenant_id, c.derivation, c.key, c.lease_token, c.attempts
 """
 
 
 def claim(owner: str, limit: int = 10, tenant_id: int | None = None) -> list[Claim]:
-    sql = _CLAIM_SQL.format(tenant_filter="AND tenant_id = %(tenant)s" if tenant_id else "")
+    sql = _CLAIM_SQL.format(tenant_filter="AND t.id = %(tenant)s" if tenant_id else "")
     with transaction.atomic(), connection.cursor() as cur:
         cur.execute(
             sql,
