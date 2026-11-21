@@ -167,10 +167,20 @@ def write(request: HttpRequest, tenant_id: int) -> JsonResponse:
     key = request.headers.get("Idempotency-Key")
     if key is not None and not (0 < len(key) <= 200):
         raise BadRequest("Idempotency-Key must be 1-200 characters")
-    _check_backlog(tenant_id)
+    dry_run = body.get("dry_run", False)
+    if not isinstance(dry_run, bool):
+        raise BadRequest("dry_run must be true or false")
     reason = body.get("reason", "")
     if not isinstance(reason, str) or len(reason) > 2000:
         raise BadRequest("reason must be a string of at most 2000 characters")
+    if dry_run:
+        try:
+            result = writes.apply(tenant_id, ops, reason=reason, dry_run=True)
+        except writes.WriteError as exc:
+            raise BadRequest(str(exc)) from None
+        metrics.writes.labels("dry_run").inc()
+        return JsonResponse(result.as_json())
+    _check_backlog(tenant_id)
     with metrics.write_seconds.time():
         try:
             result = writes.apply(
