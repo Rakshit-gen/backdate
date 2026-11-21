@@ -7,6 +7,7 @@ with the development secret key.
 
 from __future__ import annotations
 
+import logging
 from pathlib import Path
 
 from server.env import ConfigError, env_bool, env_int, env_list, env_str
@@ -89,10 +90,9 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = BACKDATE["MAX_BODY_BYTES"]
 LOG_LEVEL = env_str("LOG_LEVEL", "INFO")
 LOG_JSON = env_bool("LOG_JSON", ENVIRONMENT != "development")
 
-LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "handlers": {"console": {"class": "logging.StreamHandler"}},
-    "root": {"handlers": ["console"], "level": LOG_LEVEL},
-    "loggers": {"django.db.backends": {"level": "WARNING"}},
-}
+LOGGING_CONFIG = None  # configured below with structlog
+
+from backdate.observability.logging import configure as _configure_logging  # noqa: E402
+
+_configure_logging(json=LOG_JSON, level=LOG_LEVEL)
+logging.getLogger("django.db.backends").setLevel(logging.WARNING)
