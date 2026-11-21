@@ -21,7 +21,7 @@ jobs:
       - name: bandit
         run: uv run bandit -q -r backdate server examples -x '*/migrations/*'
       - name: pip-audit
-        run: uv export --frozen --no-dev --no-hashes | uv run pip-audit -r /dev/stdin --strict
+        run: uv export --frozen --no-dev --no-hashes --no-emit-project | uv run pip-audit -r /dev/stdin --strict
 
   test:
     runs-on: ubuntu-latest
