@@ -191,3 +191,20 @@ td s { color: var(--muted); text-decoration-color: var(--redpen); text-decoratio
 .small { font-size: 14px; margin-top: 12px; }
 .strong { font-weight: 600; }
 .fields .field > span { display: block; }
+
+/* ---- invalidation ---- */
+.toolbar { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+.loom { position: relative; width: 100%; background: var(--sheet); border: 1px solid var(--ruling); }
+.loom canvas { display: block; }
+.loom-label { position: absolute; transform: translate(-100%, -50%); font-size: 13px; line-height: 1; font-stretch: 80%; color: var(--muted); white-space: nowrap; pointer-events: none; }
+.loom-label.row { font-weight: 700; color: var(--graphite); font-size: 14px; }
+.loom-label.month { transform: translate(-50%, -50%); }
+.loom-node { position: absolute; width: 28px; height: 28px; transform: translate(-50%, -50%); padding: 0; border: 0; border-radius: 50%; background: transparent; cursor: pointer; }
+.loom-node:hover:not([disabled]) { background: transparent; }
+.loom-node:focus-visible { outline-offset: 0; }
+.detail h2 { margin-bottom: 8px; }
+@media (max-width: 760px) { .loom-label.month:nth-of-type(odd) { visibility: hidden; } .loom-label { font-size: 11px; } }
+td.picked { background: color-mix(in oklab, var(--carbon) 9%, transparent); }
+button.link { background: none; border: 0; padding: 0; font-weight: 400; color: var(--redpen); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+button.link:hover:not([disabled]) { background: none; color: var(--carbon); }
+.detail { position: sticky; top: 24px; align-self: start; }

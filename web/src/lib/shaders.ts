@@ -1,59 +1,101 @@
-// GLSL for the sheet stack and the stale graph. Kept as strings next to each other so the
-// shared noise function is written once.
+// GLSL for the invalidation graph. Ink is a function of time: each line and node knows when
+// the correction reaches it (aStart, seconds; -1 means never), so one uniform drives everything.
 
-const noise = /* glsl */ `
-  float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
-  float grain(vec2 p) {
-    vec2 i = floor(p), f = fract(p);
-    vec2 u = f * f * (3.0 - 2.0 * f);
-    return mix(mix(hash(i), hash(i + vec2(1, 0)), u.x), mix(hash(i + vec2(0, 1)), hash(i + vec2(1, 1)), u.x), u.y);
-  }
-`;
-
-export const passUv = /* glsl */ `
-  varying vec2 vUv;
+export const lineVert = /* glsl */ `
+  attribute float aAlong;
+  attribute float aSide;
+  attribute float aStart;
+  attribute float aDur;
+  varying float vAlong;
+  varying float vSide;
+  varying float vStart;
+  varying float vDur;
   void main() {
-    vUv = uv;
+    vAlong = aAlong;
+    vSide = aSide;
+    vStart = aStart;
+    vDur = aDur;
     gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
   }
 `;
 
-/** A sheet of ledger paper: grain, a rule at each month, lane separators. */
-export const sheetFrag = /* glsl */ `
-  uniform vec3 uPaper;
-  uniform vec3 uRuling;
-  uniform float uOpacity;
-  uniform float uLanes;
-  uniform float uSeed;
-  varying vec2 vUv;
-  ${noise}
-  float line(float x, float w) { return 1.0 - smoothstep(0.0, w, abs(x)); }
+export const lineFrag = /* glsl */ `
+  uniform float uTime;
+  uniform vec3 uBase;
+  uniform vec3 uInk;
+  varying float vAlong;
+  varying float vSide;
+  varying float vStart;
+  varying float vDur;
   void main() {
-    // 12 months span the first 12/13 of the sheet; the last 13th is "after 2024".
-    float m = vUv.x * 13.0;
-    float monthRule = line(fract(m + 0.5) - 0.5, 0.035) * step(m, 12.02);
-    float lane = line(fract(vUv.y * uLanes + 0.5) - 0.5, 0.02 * uLanes);
-    float edge = max(line(vUv.x, 0.004), max(line(vUv.x - 1.0, 0.004), max(line(vUv.y, 0.01), line(vUv.y - 1.0, 0.01))));
-    float g = grain(vUv * vec2(420.0, 160.0) + uSeed) * 0.5 + grain(vUv * vec2(60.0, 24.0) + uSeed) * 0.5;
-    vec3 col = uPaper * (0.965 + 0.05 * g);
-    col = mix(col, uRuling, max(monthRule * 0.55, max(lane * 0.35, edge)));
-    gl_FragColor = vec4(col, uOpacity);
+    vec3 col = uBase;
+    float alpha = 0.9;
+    if (vStart >= 0.0) {
+      float p = clamp((uTime - vStart) / vDur, 0.0, 1.0);
+      float inked = step(vAlong, p);
+      col = mix(uBase, uInk, inked);
+      // A short darker head where the ink is still travelling.
+      float head = (1.0 - step(1.0, p)) * smoothstep(0.07, 0.0, abs(vAlong - p));
+      col = mix(col, uInk * 0.7, head);
+      alpha = mix(0.9, 1.0, inked);
+    }
+    alpha *= 1.0 - smoothstep(0.55, 1.0, abs(vSide));
+    gl_FragColor = vec4(col, alpha);
     #include <colorspace_fragment>
   }
 `;
 
-/** Ink printed on a sheet. Open-ended ranges fade out from uFadeFrom (in the quad's own u). */
-export const inkFrag = /* glsl */ `
-  uniform vec3 uColor;
-  uniform float uOpacity;
-  uniform float uFadeFrom;
-  uniform float uSeed;
-  varying vec2 vUv;
-  ${noise}
+export const nodeVert = /* glsl */ `
+  attribute vec2 aLocal;
+  attribute float aStart;
+  attribute float aPick;
+  varying vec2 vLocal;
+  varying float vStart;
+  varying float vPick;
   void main() {
-    float press = 0.82 + 0.18 * grain(vUv * vec2(90.0, 18.0) + uSeed);
-    float fade = uFadeFrom < 1.0 ? 1.0 - smoothstep(uFadeFrom, 1.0, vUv.x) : 1.0;
-    gl_FragColor = vec4(uColor, uOpacity * press * fade);
+    vLocal = aLocal;
+    vStart = aStart;
+    vPick = aPick;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }
+`;
+
+/** A result: a ring that fills with red when the ink arrives, and one ripple as it does. */
+export const nodeFrag = /* glsl */ `
+  uniform float uTime;
+  uniform float uRadius;
+  uniform vec3 uPaper;
+  uniform vec3 uGraphite;
+  uniform vec3 uInk;
+  uniform vec3 uCarbon;
+  varying vec2 vLocal;
+  varying float vStart;
+  varying float vPick;
+  void main() {
+    // vLocal is in pixels from the node centre.
+    float d = length(vLocal);
+    float aa = 0.8;
+    float hit = vStart >= 0.0 ? smoothstep(vStart, vStart + 0.25, uTime) : 0.0;
+    vec3 ring = mix(uGraphite, uInk, hit);
+    vec3 fill = mix(uPaper, uInk, hit * 0.85);
+    if (vPick > 0.5) ring = uCarbon;
+    float body = 1.0 - smoothstep(uRadius - aa, uRadius + aa, d);
+    float inner = 1.0 - smoothstep(uRadius - 2.0 - aa, uRadius - 2.0 + aa, d);
+    vec3 col = mix(ring, fill, inner);
+    float alpha = body;
+    if (vStart >= 0.0) {
+      float t = uTime - vStart;
+      float r = uRadius + t * 34.0;
+      float ripple = (1.0 - smoothstep(0.0, 1.6, abs(d - r))) * clamp(1.0 - t / 0.7, 0.0, 1.0) * step(0.0, t);
+      col = mix(uInk, col, body);
+      alpha = max(alpha, ripple * 0.6);
+    }
+    if (vPick > 0.5) {
+      float halo = 1.0 - smoothstep(1.0, 2.2, abs(d - uRadius - 4.0));
+      col = mix(col, uCarbon, halo * (1.0 - body));
+      alpha = max(alpha, halo);
+    }
+    gl_FragColor = vec4(col, alpha);
     #include <colorspace_fragment>
   }
 `;
