@@ -181,3 +181,13 @@ td s { color: var(--muted); text-decoration-color: var(--redpen); text-decoratio
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition-duration: 0s !important; animation-duration: 0s !important; }
 }
+
+/* ---- payroll ---- */
+.fields { display: flex; flex-wrap: wrap; gap: 16px 24px; align-items: end; margin: 16px 0; }
+.fields input[type="number"] { width: 180px; }
+.notice { padding: 10px 14px; border-left: 3px solid var(--carbon); background: color-mix(in oklab, var(--carbon) 7%, transparent); max-width: none; }
+.notice.error { border-left-color: var(--redpen); background: color-mix(in oklab, var(--redpen) 8%, transparent); }
+.months tr.before td { color: var(--muted); }
+.small { font-size: 14px; margin-top: 12px; }
+.strong { font-weight: 600; }
+.fields .field > span { display: block; }
