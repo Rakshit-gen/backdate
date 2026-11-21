@@ -20,6 +20,6 @@ Option 3.
 
 ## Consequences
 
-- Writes within a tenant run one at a time. Measured on a laptop: 349 writes/s with 8 writers in one tenant versus 556 spread over 8 tenants ([benchmarks](../benchmarks.md#clock-contention)). That is a ceiling of a few hundred writes per second per tenant. For payroll or billing, writes are rare compared to reads and computes, so that is fine. It would not be fine for a per-event stream.
+- Writes within a tenant run one at a time. Measured on one machine: 349 writes/s with 8 writers in one tenant versus 556 spread over 8 tenants ([benchmarks](../benchmarks.md#clock-contention)). That is a ceiling of a few hundred writes per second per tenant. For payroll or billing, writes are rare compared to reads and computes, so that is fine. It would not be fine for a per-event stream.
 - A long write transaction blocks other writes, and saves, in that tenant. `statement_timeout` and `idle_in_transaction_session_timeout` are set in settings to bound this.
 - If one tenant ever needs more, the next step is option 2 for that tenant, not sharding the clock.
