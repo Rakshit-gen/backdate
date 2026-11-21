@@ -71,12 +71,22 @@ class WriteResult:
     changes: list[Change] = field(default_factory=list)
     invalidated: int = 0
     replayed: bool = False
+    dry_run: bool = False
+    # (derivation, key) of every result the write marks stale. Filled in for dry runs only.
+    affected: list[tuple[str, str]] = field(default_factory=list)
 
     @property
     def noop(self) -> bool:
         return not self.changes
 
     def as_json(self) -> dict[str, Any]:
+        out = self._json()
+        if self.dry_run:
+            out["dry_run"] = True
+            out["affected"] = [{"derivation": d, "key": k} for d, k in self.affected]
+        return out
+
+    def _json(self) -> dict[str, Any]:
         return {
             "version": self.version,
             "noop": self.noop,
@@ -101,8 +111,57 @@ def apply(
     reason: str = "",
     idempotency_key: str | None = None,
     request_hash: str = "",
+    dry_run: bool = False,
 ) -> WriteResult:
+    """Apply ``ops`` in one transaction.
+
+    With ``dry_run`` the whole write runs, including the invalidation join, and
+    is then rolled back. The result says which version it would have been, what
+    would change and which results would go stale. Dry runs skip idempotency.
+    """
     _validate(ops)
+    if dry_run:
+        try:
+            with transaction.atomic():
+                _apply(
+                    tenant_id,
+                    ops,
+                    actor=actor,
+                    reason=reason,
+                    idempotency_key=None,
+                    request_hash="",
+                    dry_run=True,
+                )
+        except _DryRun as done:
+            return done.result
+        raise AssertionError("a dry run always rolls back")
+    return _apply(
+        tenant_id,
+        ops,
+        actor=actor,
+        reason=reason,
+        idempotency_key=idempotency_key,
+        request_hash=request_hash,
+    )
+
+
+class _DryRun(Exception):
+    """Raised inside the transaction to roll a dry run back, carrying its result."""
+
+    def __init__(self, result: WriteResult) -> None:
+        self.result = result
+
+
+def _apply(
+    tenant_id: int,
+    ops: Sequence[Op],
+    *,
+    actor: str,
+    reason: str,
+    idempotency_key: str | None,
+    request_hash: str,
+    dry_run: bool = False,
+) -> WriteResult:
     with transaction.atomic():
         base = clock.lock_for_write(tenant_id)
 
@@ -126,8 +185,14 @@ def apply(
                 idempotency_key=idempotency_key or "",
             )
             changes = _persist(tenant_id, changeset, plans)
-            invalidated = invalidate(tenant_id, version, changes)
-            result = WriteResult(version=version, changes=changes, invalidated=invalidated)
+            affected = invalidate(tenant_id, version, changes)
+            result = WriteResult(version=version, changes=changes, invalidated=len(affected))
+            if dry_run:
+                result.affected = sorted(affected)
+
+        if dry_run:
+            result.dry_run = True
+            raise _DryRun(result)
 
         if idempotency_key is not None:
             IdempotencyRecord.objects.create(
@@ -284,13 +349,14 @@ UPDATE backdate_computation c
    AND c.tenant_id = %(tenant)s
    AND c.status IN ('fresh', 'failed')
    AND (c.result_version IS NULL OR c.result_version < %(version)s)
+RETURNING c.derivation, c.key
 """
 
 
-def invalidate(tenant_id: int, version: int, changes: Sequence[Change]) -> int:
-    """Mark results that read any changed span stale. Returns how many."""
+def invalidate(tenant_id: int, version: int, changes: Sequence[Change]) -> list[tuple[str, str]]:
+    """Mark results that read any changed span stale. Returns their (derivation, key)."""
     if not changes:
-        return 0
+        return []
     with connection.cursor() as cur:
         cur.execute(
             _INVALIDATE_SQL,
@@ -302,7 +368,7 @@ def invalidate(tenant_id: int, version: int, changes: Sequence[Change]) -> int:
                 "ranges": [_range_literal(c.span) for c in changes],
             },
         )
-        return int(cur.rowcount)
+        return [(d, k) for d, k in cur.fetchall()]
 
 
 def _range_literal(span: Span) -> str:
