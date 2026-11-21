@@ -468,3 +468,48 @@ def feed(request: HttpRequest, tenant_id: int) -> JsonResponse:
 
 def _json(value: Any) -> Any:
     return json.loads(value) if isinstance(value, str) else value
+
+
+# ---- dependency graph ------------------------------------------------------
+
+
+@endpoint("read")
+def graph(request: HttpRequest, tenant_id: int) -> JsonResponse:
+    """Computations with their read sets and derived edges, in one response.
+
+    Meant for visualising which facts feed which results. Filter by
+    ``key_prefix`` to keep it small; ``limit`` caps the computation count.
+    """
+    limit = _int(request, "limit", 200, lo=1, hi=2000) or 200
+    qs = Computation.objects.filter(tenant_id=tenant_id).order_by("id")
+    if prefix := request.GET.get("key_prefix"):
+        qs = qs.filter(key__startswith=prefix)
+    comps = list(qs[:limit])
+    ids = [c.id for c in comps]
+    reads_by: dict[int, list[dict[str, Any]]] = {}
+    for r in ReadRange.objects.filter(computation_id__in=ids).values(
+        "computation_id", "entity", "attribute", "valid"
+    ):
+        reads_by.setdefault(r["computation_id"], []).append(
+            {
+                "entity": r["entity"],
+                "attribute": r["attribute"],
+                **_span_json(Span.from_range(r["valid"])),
+            }
+        )
+    edges = [
+        {"source": s, "reader": rd, "observed_seq": seq}
+        for s, rd, seq in DerivedRead.objects.filter(reader_id__in=ids).values_list(
+            "source_id", "reader_id", "observed_seq"
+        )
+    ]
+    return JsonResponse(
+        {
+            "version": reads.committed_version(tenant_id),
+            "computations": [
+                {**_computation_json(c), "reads": reads_by.get(c.id, [])} for c in comps
+            ],
+            "edges": edges,
+            "truncated": len(comps) == limit,
+        }
+    )

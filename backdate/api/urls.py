@@ -13,4 +13,5 @@ urlpatterns = [
     path("computations", views.computations, name="computations"),
     path("computations/<int:computation_id>", views.computation, name="computation"),
     path("restatements", views.feed, name="feed"),
+    path("graph", views.graph, name="graph"),
 ]
