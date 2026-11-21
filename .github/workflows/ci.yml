@@ -1,0 +1,56 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync --frozen
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+      - run: uv run mypy backdate server examples
+      - name: bandit
+        run: uv run bandit -q -r backdate server examples -x '*/migrations/*'
+      - name: pip-audit
+        run: uv export --frozen --no-dev --no-hashes | uv run pip-audit -r /dev/stdin --strict
+
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: backdate
+          POSTGRES_PASSWORD: backdate
+          POSTGRES_DB: backdate
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U backdate"
+          --health-interval 2s --health-retries 30
+    env:
+      PGHOST: localhost
+      PGPORT: "5432"
+      PGUSER: backdate
+      PGPASSWORD: backdate
+      PGDATABASE: backdate
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync --frozen
+      - run: uv run python manage.py makemigrations --check --dry-run
+      - run: uv run pytest -q
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t backdate:ci .
