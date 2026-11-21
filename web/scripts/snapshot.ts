@@ -7,9 +7,14 @@ const res = await fetch(`${base}/api/scene`);
 if (!res.ok) throw new Error(`${res.status} ${await res.text()}`);
 const scene = await res.json();
 const recordedAt = new Date().toISOString();
+type Change = { attribute: string; from: string };
+const corrections = (scene.changesets as { version: number; changes: Change[] }[])
+  .slice(1)
+  .map((c) => `v${c.version} changes ${c.changes.map((x) => `${x.attribute} from ${x.from}`).join(", ")}`);
 const note =
-  "Recorded from a real run: 20 seeded employees, then one raise for employee 7 backdated " +
-  "to 1 March through the API, then a worker pass. Nothing in it is made up.";
+  `Recorded from a real run at version ${scene.clock.version}: seeded employees, then ` +
+  (corrections.length ? `these corrections to employee ${scene.employee}: ${corrections.join("; ")}. ` : "no corrections. ") +
+  "Workers recomputed after each one. Nothing in it is made up.";
 writeFileSync(
   new URL("../src/data/recording.json", import.meta.url),
   JSON.stringify({ recordedAt, note, scene }, null, 1) + "\n",
