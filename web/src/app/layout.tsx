@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import { Instrument_Sans, JetBrains_Mono } from "next/font/google";
 import { Header, NextStep } from "@/components/Header";
 import { SceneProvider } from "@/components/SceneProvider";
-import { SourceNote } from "@/components/SourceNote";
 import { getSource } from "@/lib/source";
 import "./globals.css";
 
@@ -26,7 +25,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body>
         <SceneProvider source={source}>
           <Header />
-          <SourceNote />
           <main id="main">
             {children}
             <NextStep />

@@ -24,7 +24,6 @@ for (const [path, title] of PAGES) {
     const errors = collectErrors(page);
     await page.goto(path);
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(title);
-    await expect(page.locator(".source.recording")).toContainText("Recording");
     expect(errors).toEqual([]);
   });
 

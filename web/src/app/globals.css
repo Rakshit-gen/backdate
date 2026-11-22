@@ -106,6 +106,10 @@ code {
   gap: 8px 32px;
 }
 .wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  align-self: center;
   font-size: 21px;
   font-weight: 700;
   letter-spacing: -0.04em;
@@ -129,31 +133,6 @@ code {
 .site-header nav a[aria-current="page"] {
   color: var(--graphite);
   border-bottom-color: var(--graphite);
-}
-
-.source {
-  max-width: var(--wrap);
-  margin: 0 auto;
-  padding: 0 var(--pad);
-}
-.source p {
-  margin: 0;
-  max-width: none;
-  padding: 9px 14px;
-  font-size: 15px;
-  line-height: 1.5;
-  border-left: 3px solid var(--carbon);
-  background: color-mix(in oklab, var(--carbon) 7%, transparent);
-}
-.source strong {
-  color: var(--carbon);
-}
-.source.recording p {
-  border-left-color: var(--redpen);
-  background: color-mix(in oklab, var(--redpen) 7%, transparent);
-}
-.source.recording strong {
-  color: var(--redpen);
 }
 
 .page {
