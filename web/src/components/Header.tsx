@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Logo } from "./Logo";
 
 // In the order a backdate happens, so each page can point at the next one.
 export const PAGES = [
@@ -42,6 +43,7 @@ export function Header() {
         Skip to content
       </a>
       <Link href="/" className="wordmark" aria-current={path === "/" ? "page" : undefined}>
+        <Logo />
         backdate
       </Link>
       <nav aria-label="Pages">
